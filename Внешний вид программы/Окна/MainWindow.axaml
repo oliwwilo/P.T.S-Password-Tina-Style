@@ -1,0 +1,885 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:TinaPASS.Main"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="TinaPASS.Main.MainWindow"
+        Title=""
+        Icon="/Assets/Логотип.ico"
+        TransparencyLevelHint="AcrylicBlur"
+        Background="Transparent"
+        ExtendClientAreaToDecorationsHint="True"
+MinHeight="400"
+         MinWidth="700"
+         DragDrop.AllowDrop="True">
+
+    <Window.Resources>
+        <ControlTheme x:Key="NoHighlightTextBox"
+                      TargetType="TextBox"
+                      BasedOn="{StaticResource {x:Type TextBox}}">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Style Selector="^:pointerover /template/ Border#PART_BorderElement">
+                <Setter Property="Background" Value="Transparent" />
+                <Setter Property="BorderBrush" Value="Transparent" />
+            </Style>
+            <Style Selector="^:focus /template/ Border#PART_BorderElement">
+                <Setter Property="Background" Value="Transparent" />
+                <Setter Property="BorderBrush" Value="Transparent" />
+            </Style>
+        </ControlTheme>
+    </Window.Resources>
+
+    <Grid PointerPressed="OnRootPointerPressed">
+
+        <!-- ======================================== -->
+        <!-- ОСНОВНОЙ КОНТЕНТ                         -->
+        <!-- ======================================== -->
+        <RelativePanel x:Name="MainContent">
+<Border Background="{DynamicResource BackgroundBrush}"
+                   Opacity="0.8"
+                   RelativePanel.AlignLeftWithPanel="True"
+                   RelativePanel.AlignRightWithPanel="True"
+                   RelativePanel.AlignTopWithPanel="True"
+                   RelativePanel.AlignBottomWithPanel="True"/>
+
+            <Canvas x:Name="StarCanvas"
+                    Background="Transparent"
+                    IsHitTestVisible="False"
+                    RelativePanel.AlignLeftWithPanel="True"
+                    RelativePanel.AlignRightWithPanel="True"
+                    RelativePanel.AlignTopWithPanel="True"
+                    RelativePanel.AlignBottomWithPanel="True"/>
+            <Border Background="Transparent"
+                    RelativePanel.AlignLeftWithPanel="True"
+                    RelativePanel.AlignRightWithPanel="True"
+                    RelativePanel.AlignTopWithPanel="True"
+                    RelativePanel.AlignBottomWithPanel="True"/>
+
+            <TextBlock x:Name="WelcomeGif"
+                       Text="LSPK"
+                       FontFamily="avares://TinaPASS/Assets/Fonts#Zalando Sans SemiExpanded"
+                       FontSize="14"
+                       FontWeight="Bold"
+                       Foreground="#D5F8F8"
+                       RelativePanel.RightOf="Nadpis"
+                       RelativePanel.AlignVerticalCenterWith="Nadpis"
+                       Margin="65,0,0,0"
+                       IsVisible="True"
+                       />
+   
+   <!-- Информация о выделении -->
+   <TextBlock x:Name="SelectionInfoText"
+              Foreground="{DynamicResource PrimaryBrush}"
+              FontSize="13"
+              FontWeight="SemiBold"
+              RelativePanel.Below="PANEL"
+              RelativePanel.AlignRightWithPanel="True"
+              Margin="0,145,20,0"
+              IsVisible="False"/>
+            <TextBlock x:Name="Nadpis"
+                       Text="Группы"
+                       LetterSpacing="2"
+                       FontSize="30"
+                       FontFamily="Inter"
+                       FontWeight="ExtraBold"
+                       Foreground="{DynamicResource AccentBrush}"
+                       RelativePanel.Below="PANEL"
+                       RelativePanel.AlignLeftWithPanel="True"
+                       Margin="20,16,0,0" />
+            
+            <Button x:Name="AddButton"
+                    Width="22"
+                    Height="22"
+                    Padding="0"
+                    Background="Transparent"
+                    Click="OnAddGroupClick"
+                    CornerRadius="20"
+                    RelativePanel.RightOf="Nadpis"
+                    RelativePanel.AlignVerticalCenterWith="Nadpis"
+                    Margin="8,22,0,0"
+                    ToolTip.Tip="Добавить группу">
+                <Button.Styles>
+                    <!-- Отключаем глобальную белую подсветку: у плюсика только плавное затухание -->
+                    <Style Selector="Button:pointerover /template/ ContentPresenter">
+                        <Setter Property="Background" Value="Transparent" />
+                    </Style>
+                    <Style Selector="Button:pressed /template/ ContentPresenter">
+                        <Setter Property="Background" Value="Transparent" />
+                    </Style>
+                    <Style Selector="Button Grid">
+                        <Setter Property="Opacity" Value="1" />
+                        <Setter Property="Transitions">
+                            <Transitions>
+                                <DoubleTransition Property="Opacity"
+                                                  Duration="0:0:0.2"
+                                                  Easing="CubicEaseOut" />
+                            </Transitions>
+                        </Setter>
+                    </Style>
+                    <Style Selector="Button:pointerover Grid">
+                        <Setter Property="Opacity" Value="0.8" />
+                    </Style>
+                    <Style Selector="Button:pressed Grid">
+                        <Setter Property="Opacity" Value="0.6" />
+                    </Style>
+                </Button.Styles>
+                <Grid Width="22" Height="22">
+                    <Ellipse Fill="#00E676" Width="22" Height="22" />
+                    <Rectangle Fill="Black" Width="12" Height="2"
+                               HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    <Rectangle Fill="Black" Width="2" Height="12"
+                               HorizontalAlignment="Center" VerticalAlignment="Center" />
+                </Grid>
+            </Button>
+
+            <Grid RelativePanel.Below="Nadpis"
+                  RelativePanel.AlignLeftWithPanel="True"
+                  Margin="20,10,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                
+                <TextBlock Grid.Column="0"
+                           Text="Без группы"
+                           FontSize="14"
+                           FontWeight="Bold"
+                           Foreground="#FFFFFFFF"
+                           VerticalAlignment="Center"
+                           Margin="0,0,15,0" />
+                <ToggleSwitch Grid.Column="1"
+                              x:Name="NoGroupSwitch"
+                              OnContent=""
+                              OffContent=""
+                              IsCheckedChanged="OnNoGroupSwitchChanged">
+                    <ToggleSwitch.Styles>
+                        <Style Selector="ToggleSwitch">
+                            <Setter Property="Opacity" Value="1" />
+                            <Setter Property="Transitions">
+                                <Transitions>
+                                    <DoubleTransition Property="Opacity"
+                                                      Duration="0:0:0.2"
+                                                      Easing="CubicEaseOut" />
+                                </Transitions>
+                            </Setter>
+                        </Style>
+                        <Style Selector="ToggleSwitch:pointerover">
+                            <Setter Property="Opacity" Value="0.8" />
+                        </Style>
+                        <Style Selector="ToggleSwitch:pressed">
+                            <Setter Property="Opacity" Value="0.6" />
+                        </Style>
+                    </ToggleSwitch.Styles>
+                </ToggleSwitch>
+                <Button Grid.Column="2"
+                        x:Name="EyeToggleButton"
+                        Width="28"
+                        Height="28"
+                        Padding="0"
+                        Background="Transparent"
+                        Click="OnToggleGroupsClick"
+                        CornerRadius="14"
+                        VerticalAlignment="Center"
+                        Margin="0,0,0,0"
+                        ToolTip.Tip="Показать/скрыть названия групп">
+                    <Button.Styles>
+                        <Style Selector="Button">
+                            <Setter Property="Opacity" Value="1" />
+                        </Style>
+                        <Style Selector="Button:pointerover">
+                            <Setter Property="Opacity" Value="0.8" />
+                        </Style>
+                        <Style Selector="Button:pressed">
+                            <Setter Property="Opacity" Value="0.6" />
+                        </Style>
+                    </Button.Styles>
+                    <Grid Width="18" Height="18"
+                          HorizontalAlignment="Center"
+                          VerticalAlignment="Center">
+                        <TextBlock x:Name="EyeOpenIcon"
+                                   Text="&#xE890;"
+                                   FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                                   FontSize="15"
+                                   Foreground="#FFFFFFFF"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"/>
+                        <Path x:Name="EyeClosedIcon"
+                              Data="M1,7 Q9,14 17,7"
+                              Stroke="#FFFFFFFF"
+                              StrokeThickness="1.7"
+                              StrokeLineCap="Round"
+                              HorizontalAlignment="Center"
+                              VerticalAlignment="Center"
+                              IsVisible="False"/>
+                    </Grid>
+                </Button>
+                
+            </Grid>
+  
+           
+
+            <!-- ======================================== -->
+            <!-- ПРАВАЯ ЧАСТЬ (Пароли)                   -->
+            <!-- ======================================== -->
+   
+            <Border x:Name="GroupIconBorder"
+                    Width="120"
+                    Height="120"
+                    CornerRadius="10"
+                    Background="{DynamicResource SurfaceBrush}"
+                    Margin="0,40,60,0"
+                    RelativePanel.AlignRightWithPanel="True"
+                    RelativePanel.AlignTopWithPanel="True"
+                    IsVisible="True"
+                    Cursor="Hand"
+                    PointerPressed="OnGroupIconClick"
+                    ClipToBounds="True"
+                    ToolTip.Tip="Добавить фото">
+                <Panel>
+                    <Image x:Name="GroupIcon" Stretch="UniformToFill" />
+                    <TextBlock x:Name="GroupIconInitial"
+                               Text=""
+                               FontFamily="Inter"
+                               FontWeight="Bold"
+                               FontSize="48"
+                               Foreground="White"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center"
+                               IsVisible="False" />
+                    <TextBlock x:Name="GroupIconHint"
+                               Text="Перетаскивай сюда"
+                               FontSize="11"
+                               Foreground="{DynamicResource PrimaryBrush}"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Bottom"
+                               Margin="0,0,0,6"
+                               IsVisible="False" />
+                </Panel>
+            </Border>
+
+            <TextBox x:Name="GroupNameEditor"
+                     Theme="{StaticResource NoHighlightTextBox}"
+                     FontSize="13"
+                     FontWeight="Bold"
+                     Background="Transparent"
+                     BorderThickness="0"
+                     SelectionBrush="Transparent"
+                     SelectionForegroundBrush="White"
+                     CaretBrush="White"
+                     Width="120"
+                     Height="20"
+                     HorizontalAlignment="Center"
+                     TextAlignment="Center"
+                     RelativePanel.Below="PANEL"
+                     RelativePanel.AlignRightWithPanel="True"
+                     RelativePanel.AlignTopWithPanel="True"
+                     Margin="0,153,60,0"
+                     TextChanged="OnGroupNameChanged"
+                     KeyDown="OnGroupNameEditorKeyDown"
+                     IsVisible="False" 
+                     ToolTip.Tip="Изменить название"/>
+
+            <TextBlock x:Name="smenaslo"
+                       Text="Пароли"
+                       LetterSpacing="6"
+                       FontSize="64"
+                       FontFamily="42dot Sans"
+                       FontWeight="ExtraBold"
+                       Foreground="{DynamicResource AccentBrush}"
+                       RelativePanel.AlignLeftWithPanel="True"
+                        Margin="120,180,0,0"
+                        IsVisible="True" />
+
+           
+
+            <Button x:Name="DeleteGroupButton"
+                    RelativePanel.Below="PANEL"
+                    RelativePanel.AlignRightWithPanel="True"
+                    Margin="0,175,31,0"
+                    Height="36"
+                    Padding="14,0"
+                    CornerRadius="10"
+                    Background="Transparent"
+                    IsVisible="True"
+                    Cursor="Hand"
+                    Click="OnDeleteGroupClick">
+                <Button.Styles>
+                    <!-- Серая корзина → при наведении красный фон и красный текст -->
+                    <Style Selector="Button">
+                        <Setter Property="Foreground" Value="#CFCFCF" />
+                        <Setter Property="Transitions">
+                            <Transitions>
+                                <BrushTransition Property="Background" Duration="0:0:0.15" />
+                                <BrushTransition Property="Foreground" Duration="0:0:0.15" />
+                            </Transitions>
+                        </Setter>
+                    </Style>
+                    <Style Selector="Button:pointerover">
+                        <Setter Property="Background" Value="#2AEF4444" />
+                        <Setter Property="Foreground" Value="#FCA5A5" />
+                    </Style>
+                    <Style Selector="Button:pressed">
+                        <Setter Property="Background" Value="#44EF4444" />
+                        <Setter Property="Foreground" Value="#FCA5A5" />
+                    </Style>
+                    <!-- Отключаем глобальную белую подсветку -->
+                    <Style Selector="Button /template/ ContentPresenter">
+                        <Setter Property="Background" Value="Transparent" />
+                        <Setter Property="Transitions" Value="{x:Null}" />
+                    </Style>
+                    <Style Selector="Button:pointerover /template/ ContentPresenter">
+                        <Setter Property="Background" Value="Transparent" />
+                    </Style>
+                    <Style Selector="Button:pressed /template/ ContentPresenter">
+                        <Setter Property="Background" Value="Transparent" />
+                    </Style>
+                </Button.Styles>
+                <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                    <Path Data="M10 11v6 M14 11v6 M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6 M3 6h18 M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
+                          Fill="Transparent"
+                          Stroke="{Binding $parent[Button].Foreground}"
+                          StrokeThickness="2"
+                          StrokeLineCap="Round"
+                          StrokeJoin="Round"
+                          Width="16"
+                          Height="16"
+                          Stretch="Uniform"
+                          VerticalAlignment="Center" />
+                    <TextBlock Text="Удалить группу"
+                               FontSize="14"
+                               FontWeight="Medium"
+                               Foreground="{Binding $parent[Button].Foreground}"
+                               VerticalAlignment="Center" />
+                </StackPanel>
+            </Button>
+
+            <Button x:Name="AddPassword"
+                    Click="OpenRegistrationButton_Click"
+                    RelativePanel.Below="PANEL"
+                    RelativePanel.AlignRightWithPanel="True"
+                    Margin="0,215,20,0"
+                    Height="36"
+                    Padding="14,0"
+                    CornerRadius="10"
+                    Background="Transparent"
+                    Cursor="Hand">
+                <Button.Styles>
+                    <!-- Серая кнопка → при наведении зелёный фон и зелёный текст -->
+                    <Style Selector="Button:pointerover">
+                        <Setter Property="Background" Value="#2A22C55E" />
+                        <Setter Property="Foreground" Value="#29F372" />
+                    </Style>
+                    <Style Selector="Button:pressed">
+                        <Setter Property="Background" Value="#4422C55E" />
+                        <Setter Property="Foreground" Value="#29F372" />
+                    </Style>
+                    <!-- Отключаем глобальную белую подсветку -->
+                    <Style Selector="Button /template/ ContentPresenter">
+                        <Setter Property="Background" Value="Transparent" />
+                        <Setter Property="Transitions" Value="{x:Null}" />
+                    </Style>
+                    <Style Selector="Button:pointerover /template/ ContentPresenter">
+                        <Setter Property="Background" Value="Transparent" />
+                    </Style>
+                    <Style Selector="Button:pressed /template/ ContentPresenter">
+                        <Setter Property="Background" Value="Transparent" />
+                    </Style>
+                    <Style Selector="Button:focus /template/ ContentPresenter">
+                        <Setter Property="Background" Value="Transparent" />
+                    </Style>
+                </Button.Styles>
+                <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                    <Path Data="M5 12h14 M12 5v14"
+                          Fill="Transparent"
+                          Stroke="{Binding $parent[Button].Foreground}"
+                          StrokeThickness="2"
+                          StrokeLineCap="Round"
+                          StrokeJoin="Round"
+                          Width="13"
+                          Height="13"
+                          Stretch="Uniform"
+                          VerticalAlignment="Center" />
+                    <TextBlock Text="Добавить пароль"
+                               FontSize="14"
+                               FontWeight="Medium"
+                               Foreground="{Binding $parent[Button].Foreground}"
+                               VerticalAlignment="Center" />
+                </StackPanel>
+            </Button>
+  <Grid x:Name="panelgroup"><ScrollViewer x:Name="GroupsScrollViewer"
+                      VerticalScrollBarVisibility="Auto"
+                      HorizontalScrollBarVisibility="Disabled"
+                      IsScrollInertiaEnabled="True"
+                      Width="100"
+                      RelativePanel.Below="Nadpis"
+                      RelativePanel.AlignLeftWithPanel="True"
+                      RelativePanel.AlignBottomWithPanel="True"
+                      Margin="0,135,0,0">
+          <StackPanel x:Name="GroupsPanel" 
+                      Spacing="10" 
+                      VerticalAlignment="Top"/>
+  </ScrollViewer>
+  </Grid>
+   
+   <!-- Замените RelativePanel на Grid для области паролей -->
+   <Grid  RelativePanel.RightOf="panelgroup"
+          RelativePanel.Below="PANEL"
+          RelativePanel.AlignRightWithPanel="True"
+          Margin="10,280, 20,0"
+          >
+       <Grid.RowDefinitions>
+           <RowDefinition Height="*"/>
+       </Grid.RowDefinitions>
+<ScrollViewer x:Name="Skrolbar1"
+                      Grid.Row="0"
+                      VerticalScrollBarVisibility="Auto"
+                      HorizontalScrollBarVisibility="Disabled"
+                      IsScrollInertiaEnabled="True"
+                      Margin="0,0,0,0">
+           <StackPanel x:Name="PasswordsContainer"
+                       Spacing="1"
+                       Margin="0,10,20,0"
+                       VerticalAlignment="Top"
+                       />
+       </ScrollViewer>
+   </Grid>
+   
+   <Button x:Name="ClearAllButton"
+           Click="OnClearAllClick"
+           Background="Transparent"
+           CornerRadius="10"
+           RelativePanel.RightOf="Nadpis"
+           RelativePanel.AlignRightWithPanel="True"
+           Margin="60,130,0,0"
+           Padding="14,0"
+           Height="36"
+           Cursor="Hand"
+           IsVisible="False">
+       <Button.Styles>
+           <Style Selector="Button:pointerover">
+               <Setter Property="Background" Value="#1AEF4444" />
+               <Setter Property="Foreground" Value="#FCA5A5" />
+           </Style>
+           <Style Selector="Button:pressed">
+               <Setter Property="Background" Value="#33EF4444" />
+               <Setter Property="Foreground" Value="#FCA5A5" />
+           </Style>
+           <Style Selector="Button /template/ ContentPresenter">
+               <Setter Property="Background" Value="Transparent" />
+               <Setter Property="Transitions" Value="{x:Null}" />
+           </Style>
+           <Style Selector="Button:pointerover /template/ ContentPresenter">
+               <Setter Property="Background" Value="Transparent" />
+           </Style>
+           <Style Selector="Button:pressed /template/ ContentPresenter">
+               <Setter Property="Background" Value="Transparent" />
+           </Style>
+       </Button.Styles>
+       <StackPanel Orientation="Horizontal" Spacing="6" HorizontalAlignment="Center">
+           <TextBlock Text="&#xE74D;"
+                       FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                       FontSize="14"
+                       Foreground="{Binding $parent[Button].Foreground}"
+                       VerticalAlignment="Center" />
+            <TextBlock Text="Очистить все"
+                       LetterSpacing="1"
+                       FontSize="14"
+                       FontFamily="Inter"
+                       FontWeight="Light"
+                       Foreground="{Binding $parent[Button].Foreground}"
+                       VerticalAlignment="Center" />
+       </StackPanel>
+   </Button>
+   <Button x:Name="ImportButton"
+           Click="OnImportClick"
+           Background="Transparent"
+           CornerRadius="10"
+           RelativePanel.RightOf="Nadpis"
+           RelativePanel.AlignRightWithPanel="True"
+           Margin="60,90,0,0"
+           Padding="14,0"
+           Height="36"
+           Cursor="Hand">
+       <Button.Styles>
+           <Style Selector="Button">
+               <Setter Property="Foreground" Value="#CFCFCF" />
+               <Setter Property="Transitions">
+                   <Transitions>
+                       <BrushTransition Property="Background" Duration="0:0:0.15" />
+                       <BrushTransition Property="Foreground" Duration="0:0:0.15" />
+                   </Transitions>
+               </Setter>
+           </Style>
+           <Style Selector="Button:pointerover">
+               <Setter Property="Background" Value="#1AEAB308" />
+               <Setter Property="Foreground" Value="#FDE047" />
+           </Style>
+           <Style Selector="Button:pressed">
+               <Setter Property="Background" Value="#33EAB308" />
+               <Setter Property="Foreground" Value="#FDE047" />
+           </Style>
+           <Style Selector="Button /template/ ContentPresenter">
+               <Setter Property="Background" Value="Transparent" />
+               <Setter Property="Transitions" Value="{x:Null}" />
+           </Style>
+           <Style Selector="Button:pointerover /template/ ContentPresenter">
+               <Setter Property="Background" Value="Transparent" />
+           </Style>
+           <Style Selector="Button:pressed /template/ ContentPresenter">
+               <Setter Property="Background" Value="Transparent" />
+           </Style>
+       </Button.Styles>
+       <StackPanel Orientation="Horizontal" Spacing="6" HorizontalAlignment="Center"
+                   VerticalAlignment="Center">
+            <TextBlock Text="&#xE838;"
+                       FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                       FontSize="14"
+                       Foreground="{Binding $parent[Button].Foreground}"
+                       VerticalAlignment="Center" />
+            <TextBlock Text="Импорт"
+                       LetterSpacing="1"
+                       FontSize="14"
+                       FontFamily="Inter"
+                       FontWeight="Light"
+                       Foreground="{Binding $parent[Button].Foreground}"
+                       VerticalAlignment="Center" />
+       </StackPanel>
+   </Button>
+   <Button x:Name="ClearSearchButton"
+           Grid.Column="1"
+           Width="25"
+           Height="25"
+           Margin="5,0,10,0"
+           Background="Transparent"
+           CornerRadius="12"
+           Click="OnClearSearchClick"
+           IsVisible="False"
+             ToolTip.Placement="Top"
+             ToolTip.Tip="Очистить поиск">
+        <TextBlock Text="&#xE711;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Foreground="White" FontSize="12"/>
+    </Button>
+ <TextBox x:Name="SearchBox"
+             Theme="{StaticResource NoHighlightTextBox}"
+             Height="30"
+            Margin="140,190,0,0"
+            RelativePanel.Below="Nadpis"
+            RelativePanel.AlignLeftWithPanel="True"
+            RelativePanel.AlignRightWithPanel="True"
+            HorizontalAlignment="Stretch"
+            Background="Transparent"
+            Foreground="White"
+            BorderThickness="0"
+            CornerRadius="10"
+Padding="10,5"
+             SelectionForegroundBrush="Transparent"
+             CaretBrush="White"
+             GotFocus="OnSearchGotFocus"
+             LostFocus="OnSearchLostFocus"
+             TextChanged="OnSearchTextChanged"/>
+
+ <Border x:Name="SearchPlaceholderOverlay"
+         IsHitTestVisible="False"
+         RelativePanel.Below="Nadpis"
+         RelativePanel.AlignLeftWithPanel="True"
+         RelativePanel.AlignRightWithPanel="True"
+         HorizontalAlignment="Stretch"
+         Height="30"
+         Margin="140,190,0,0"
+         Padding="10,5"
+         Opacity="1">
+     <Border.Transitions>
+         <Transitions>
+             <DoubleTransition Property="Opacity"
+                               Duration="0:0:0.18"
+                               Easing="CubicEaseOut" />
+         </Transitions>
+     </Border.Transitions>
+     <TextBlock Text=" Поиск"
+                Foreground="White"
+                VerticalAlignment="Center" />
+ </Border>
+   
+   
+   
+<Border Grid.Column="0"
+            x:Name="SearchIconBorder"
+            RelativePanel.Below="Nadpis"
+            Width="30"
+            Height="30"
+            CornerRadius="10,0,0,10"
+            Background="Transparent">
+       <Path x:Name="SearchIconPath"
+             Data="M14.5,14.5 L19,19 L18,19 L13.5,14.5 C12.5,15.5 11.2,16 10,16 C6.7,16 4,13.3 4,10 C4,6.7 6.7,4 10,4 C13.3,4 16,6.7 16,10 C16,11.2 15.5,12.5 14.5,14.5 Z M10,5 C7.2,5 5,7.2 5,10 C5,12.8 7.2,15 10,15 C12.8,15 15,12.8 15,10 C15,7.2 12.8,5 10,5 Z"
+             Fill="{DynamicResource TextBrush}"
+             Opacity="0.5"
+             Width="16"
+             Height="16"
+             Stretch="Uniform"
+             Margin="130,203,0,0"/>
+   </Border>
+   <Border x:Name="SearchUnderline"
+           Height="1"
+           Background="White"
+           HorizontalAlignment="Stretch"
+           Margin="150,1,30,0"
+           RelativePanel.Below="SearchBox"
+           RelativePanel.AlignLeftWithPanel="True"
+           RelativePanel.AlignRightWithPanel="True"/>
+            <!-- Выдвижная панель вынесена на верхний слой (см. ниже) -->
+
+            <!-- ОТКЛЮЧЕНОООООООООООООООООООООООООООООООООООО -->
+
+            <ExperimentalAcrylicBorder x:Name="Overlay"
+                                       IsVisible="False"
+
+                                       RelativePanel.AlignLeftWithPanel="True"
+                                       RelativePanel.AlignRightWithPanel="True"
+                                       RelativePanel.AlignTopWithPanel="True"
+                                       RelativePanel.AlignBottomWithPanel="True">
+                <ExperimentalAcrylicBorder.Material>
+                    <ExperimentalAcrylicMaterial
+                        BackgroundSource="None"
+                        TintColor="Black"
+                        TintOpacity="1"
+                        MaterialOpacity="1" />
+                </ExperimentalAcrylicBorder.Material>
+
+
+            </ExperimentalAcrylicBorder>
+
+            <!-- Невидимый якорь высотой с топбар (используется ссылками RelativePanel.Below="PANEL") -->
+            <Grid x:Name="PANEL"
+                  Height="32"
+                  HorizontalAlignment="Stretch"
+                  VerticalAlignment="Top"
+                  Background="Transparent" />
+
+        </RelativePanel>
+
+        <!-- Топ-бар вынесен из MainContent, чтобы не размывался при открытом меню -->
+        <Grid x:Name="TitleBar"
+              HorizontalAlignment="Stretch"
+              VerticalAlignment="Top">
+            <Border Background="{DynamicResource SurfaceBrush}"
+                    WindowDecorationProperties.ElementRole="TitleBar"
+                    Height="32">
+                <StackPanel Orientation="Horizontal" Margin="20,0" VerticalAlignment="Center">
+                    <Path
+                        Data="M24.6585 19.4221C24.4645 12.4195 29.936 14.0365 26.0169 13.756C22.6261 14.4658 22.295 19.3385 16.3975 19.7502C13.3445 19.1399 15.845 14.3654 4.8636 12.4204C8.26771 19.0595 9.55562 17.1128 6.45668 17.6985C11.6235 21.5106 16.3166 25.4714 8.54674 22.808C8.97859 24.2465 12.6805 25.3297 13.9521 26.3554C14.3598 29.6653 16.906 25.2304 15.7796 29.6741C17.4622 29.9413 20.8566 28.47 22.3831 27.8887L18.6304 32.3423C18.1075 32.9628 17.1214 33.0874 16.3112 32.6352C15.9314 32.7942 15.9703 33.307 16.3765 33.4959L16.7103 33.6512C18.3168 34.3983 20.1427 33.8943 20.8221 32.5162L22.7215 28.6633C22.895 28.3111 23.377 28.2015 23.7705 28.4247L23.9252 28.5124L24.6585 19.4221Z M19.9582 19.5771C20.9728 19.1366 19.7746 16.5889 18.6604 14.936C17.7729 13.6193 17.2509 11.3956 16.2632 11.5315C13.0224 12.1822 15.3716 11.3958 17.2509 10.6096C17.5103 10.5557 21.0096 16.902 22.8889 16.902C24.7682 17.2957 22.3266 19.334 28.2875 19.3466C31.3054 18.5309 28.3983 13.9323 39.2739 11.2482C36.4008 18.1076 34.9458 16.2507 38.1086 16.6262C33.2307 20.7819 28.8411 25.054 36.4298 21.8695C36.1146 23.3351 32.4836 24.6668 31.2904 25.7769C31.1538 29.1096 28.2289 24.8532 29.7277 29.2143C28.0587 29.5948 27.0672 27.3338 25.485 26.8564L26.7822 30.1062L27.4406 31.2092C27.7927 31.799 28.6157 32.055 29.3596 31.8059C29.5986 31.7258 29.7795 31.9801 29.5951 32.1345C28.3942 33.1397 26.4049 32.589 26.2369 31.1954L26.1635 30.5867L25.8697 29.6847C25.6059 28.8747 24.1988 29.0533 24.1486 29.9032L22.8572 27.6613L19.9582 19.5771Z"
+                          Fill="{DynamicResource PrimaryBrush}"
+                          Width="20"
+                          Height="20"
+                          Stretch="Uniform" />
+                    <TextBlock Text="T.P.S ver 1.0"
+                               LetterSpacing="2"
+                               Foreground="White"
+                               FontSize="12"
+                               FontFamily="Inter"
+                               FontWeight="SemiBold"
+                               Margin="10,0,0,0"
+                               VerticalAlignment="Center" />
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <!-- Ловушка кликов: при открытом меню закрывает его и не пропускает нажатие дальше -->
+        <Border x:Name="DrawerClickCatcher"
+                ZIndex="400"
+                Background="Transparent"
+                IsVisible="False"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Stretch"
+                PointerPressed="OnDrawerClickCatcherPressed" />
+
+        <!-- Выдвижная панель (поверх фона — блюрится только фон под меню) -->
+        <Grid VerticalAlignment="Top"
+              HorizontalAlignment="Stretch"
+              Margin="0,32,0,0"
+              ZIndex="500">
+            <Border x:Name="DrawerBackdrop"
+                    Height="0"
+                    VerticalAlignment="Top"
+                    HorizontalAlignment="Stretch"
+                    Background="#33000000"
+                    IsHitTestVisible="False"
+                    ClipToBounds="True" />
+
+            <StackPanel Orientation="Vertical"
+                        VerticalAlignment="Top"
+                        HorizontalAlignment="Stretch">
+                <Border x:Name="DrawerContainer"
+                        Height="0"
+                        Background="#59000000"
+                        BorderThickness="0,0,0,1"
+                        BorderBrush="{DynamicResource SurfaceBrush}"
+                        IsVisible="False"
+                        VerticalAlignment="Top"
+                        HorizontalAlignment="Stretch"
+                        ClipToBounds="True">
+                    <Grid ClipToBounds="True">
+                        <local:DrawerPanel x:Name="DrawerPanelControl" />
+                    </Grid>
+                </Border>
+
+                <Button x:Name="MenuButton"
+                        IsVisible="{Binding !#Overlay.IsVisible}"
+                        Background="Transparent"
+                        Width="34"
+                        Height="28"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Top"
+                        Margin="0,0,0,0"
+                        Click="OnMenuButtonClick"
+                        Cursor="Hand"
+                        ZIndex="100"
+                        Padding="0">
+                    <Border x:Name="MenuLine"
+                            Width="20"
+                            Height="2.5"
+                            CornerRadius="2"
+                            Background="White"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            PointerEntered="OnArrowPointerEnter"
+                            PointerExited="OnArrowPointerLeave" />
+                </Button>
+            </StackPanel>
+        </Grid>
+
+        <!-- ======================================== -->
+        <!-- ПАНЕЛИ (Редактор пароля / Создание группы)->по центру, поверх всего -->
+        <!-- ======================================== -->
+
+        <local:CreateGroupPanel x:Name="CreatePanel"
+                                IsVisible="False"
+                                ZIndex="200"
+                                HorizontalAlignment="Stretch"
+                                VerticalAlignment="Stretch" />
+
+        <local:PassCardRed x:Name="SwitshiControl"
+                           IsVisible="False"
+                           ZIndex="200"
+                           HorizontalAlignment="Stretch"
+                           VerticalAlignment="Stretch" />
+
+        <!-- ======================================== -->
+        <!-- ОВЕРЛЕИ (Login / Register) - ПО ЦЕНТРУ   -->
+        <!-- ======================================== -->
+
+        <local:LoginOverlay x:Name="LoginOverlayControl"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            ZIndex="302" 
+                            IsVisible="False"/>
+
+        <!-- Оверлей регистрации -->
+        <local:RegisterOverlay x:Name="RegisterOverlayControl"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center"
+                               ZIndex="302" 
+                               IsVisible="False"/>
+
+
+        <!-- Блюр для красоты (опционально) -->
+
+<!-- Оверлей логина -->
+
+        <Border x:Name="ThemeOverlay"
+                IsVisible="False"
+                Background="#80000000"
+                ZIndex="999"
+                PointerPressed="OnThemeOverlayPointerPressed"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Stretch">
+            <local:ThemeSelector x:Name="ThemeSelectorControl"
+                                 HorizontalAlignment="Center"
+                                 VerticalAlignment="Center"/>
+        </Border>
+
+        <!-- Оверлей лицензионного соглашения -->
+        <Border x:Name="LicenseOverlay"
+                IsVisible="False"
+                Background="#80000000"
+                ZIndex="999"
+                PointerPressed="OnLicenseOverlayPointerPressed"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Stretch">
+            <local:LicenseOverlay x:Name="LicenseOverlayControl"
+                                  HorizontalAlignment="Center"
+                                  VerticalAlignment="Center"/>
+        </Border>
+
+        <!-- Оверлей условий импорта -->
+        <Border x:Name="ImportOverlay"
+                IsVisible="False"
+                Background="#80000000"
+                ZIndex="999"
+                PointerPressed="OnImportOverlayPointerPressed"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Stretch">
+            <local:ImportOverlay x:Name="ImportOverlayControl"
+                                 HorizontalAlignment="Center"
+                                 VerticalAlignment="Center"/>
+        </Border>
+
+        <!-- Слой для «летящей» карточки при перетаскивании пароля -->
+        <Canvas x:Name="DragLayer"
+                IsHitTestVisible="False"
+                ZIndex="1000"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Stretch" />
+
+        <!-- Область перетаскивания окна поверх оверлеев -->
+        <Border x:Name="GlobalTitleBar"
+                ZIndex="2000"
+                Height="32"
+                Background="Transparent"
+                VerticalAlignment="Top"
+                HorizontalAlignment="Stretch"
+                WindowDecorationProperties.ElementRole="TitleBar" />
+
+        <!-- Экран загрузки данных -->
+        <Border x:Name="LoadingOverlay"
+                Background="#121212"
+                ZIndex="5000"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Stretch">
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="22">
+                <StackPanel Orientation="Horizontal" Margin="20,0" HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <Path
+                        Data="M24.6585 19.4221C24.4645 12.4195 29.936 14.0365 26.0169 13.756C22.6261 14.4658 22.295 19.3385 16.3975 19.7502C13.3445 19.1399 15.845 14.3654 4.8636 12.4204C8.26771 19.0595 9.55562 17.1128 6.45668 17.6985C11.6235 21.5106 16.3166 25.4714 8.54674 22.808C8.97859 24.2465 12.6805 25.3297 13.9521 26.3554C14.3598 29.6653 16.906 25.2304 15.7796 29.6741C17.4622 29.9413 20.8566 28.47 22.3831 27.8887L18.6304 32.3423C18.1075 32.9628 17.1214 33.0874 16.3112 32.6352C15.9314 32.7942 15.9703 33.307 16.3765 33.4959L16.7103 33.6512C18.3168 34.3983 20.1427 33.8943 20.8221 32.5162L22.7215 28.6633C22.895 28.3111 23.377 28.2015 23.7705 28.4247L23.9252 28.5124L24.6585 19.4221Z M19.9582 19.5771C20.9728 19.1366 19.7746 16.5889 18.6604 14.936C17.7729 13.6193 17.2509 11.3956 16.2632 11.5315C13.0224 12.1822 15.3716 11.3958 17.2509 10.6096C17.5103 10.5557 21.0096 16.902 22.8889 16.902C24.7682 17.2957 22.3266 19.334 28.2875 19.3466C31.3054 18.5309 28.3983 13.9323 39.2739 11.2482C36.4008 18.1076 34.9458 16.2507 38.1086 16.6262C33.2307 20.7819 28.8411 25.054 36.4298 21.8695C36.1146 23.3351 32.4836 24.6668 31.2904 25.7769C31.1538 29.1096 28.2289 24.8532 29.7277 29.2143C28.0587 29.5948 27.0672 27.3338 25.485 26.8564L26.7822 30.1062L27.4406 31.2092C27.7927 31.799 28.6157 32.055 29.3596 31.8059C29.5986 31.7258 29.7795 31.9801 29.5951 32.1345C28.3942 33.1397 26.4049 32.589 26.2369 31.1954L26.1635 30.5867L25.8697 29.6847C25.6059 28.8747 24.1988 29.0533 24.1486 29.9032L22.8572 27.6613L19.9582 19.5771Z"
+                        Width="48"
+                        Height="42"
+                        Stretch="Uniform">
+                        <Path.Fill>
+                            <LinearGradientBrush StartPoint="0.872,-0.514" EndPoint="-0.164,2.058">
+                                <GradientStop Color="#97FFE7" Offset="0" />
+                                <GradientStop Color="#D257E5" Offset="1" />
+                            </LinearGradientBrush>
+                        </Path.Fill>
+                    </Path>
+                    <TextBlock Text="T.P.S ver 1.0"
+                               LetterSpacing="2"
+                               Foreground="White"
+                               FontSize="12"
+                               FontFamily="Inter"
+                               FontWeight="SemiBold"
+                               Margin="10,0,0,0"
+                               VerticalAlignment="Center" />
+                </StackPanel>
+                <ProgressBar IsIndeterminate="True"
+                             Width="220"
+                             Height="4"
+                             HorizontalAlignment="Center" />
+                <TextBlock Text="Загрузка данных…"
+                           Foreground="#9A9A9A"
+                           FontSize="14"
+                           HorizontalAlignment="Center" />
+            </StackPanel>
+        </Border>
+    </Grid>
+
+</Window>

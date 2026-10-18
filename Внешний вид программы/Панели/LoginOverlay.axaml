@@ -1,0 +1,82 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="TinaPASS.Main.LoginOverlay"
+            >
+
+    <Grid>
+        <Border/>
+
+        
+
+            <StackPanel Spacing="20">
+
+                <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Center">
+                    <TextBlock Text="&#xE72E;"
+                               FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                               FontSize="24"
+                               Foreground="{DynamicResource AccentBrush}"
+                               VerticalAlignment="Center" />
+                    <TextBlock Text="Вход"
+                               FontSize="24"
+                               FontWeight="Bold"
+                               Foreground="{DynamicResource AccentBrush}"
+                               VerticalAlignment="Center" />
+                </StackPanel>
+
+                <TextBox x:Name="EmailBox"
+                         Watermark="Email"
+                         Background="{DynamicResource SurfaceBrush}"
+
+                         CornerRadius="10"
+                         Padding="15" />
+
+                <TextBox x:Name="PasswordBox"
+                         Watermark="Пароль"
+                         Background="{DynamicResource SurfaceBrush}"
+                 
+                         CornerRadius="10"
+                         Padding="15"
+                         PasswordChar="•" />
+
+                <Button x:Name="LoginButton"
+                        Content="Войти"
+                        Background="{DynamicResource PrimaryBrush}"
+                        Foreground="Black"
+                        FontWeight="Bold"
+                        CornerRadius="10"
+                        Height="40"
+                        Click="OnLoginClick" />
+
+                <Button x:Name="RegisterButton"
+                        Content="Нет аккаунта? Зарегистрироваться"
+                        Background="Transparent"
+                        CornerRadius="10"
+                        Height="35"
+                        Click="OnRegisterClick" />
+
+                <Button x:Name="GuestButton"
+                        Content="Продолжить без входа"
+                        Background="Transparent"
+                        Foreground="{DynamicResource TextSecondaryBrush}"
+                        CornerRadius="10"
+                        Height="35"
+                        Click="OnGuestClick" />
+
+                <TextBlock x:Name="ErrorMessageText"
+                           Foreground="Red"
+                           FontSize="12"
+                           TextWrapping="Wrap"
+                           IsVisible="False"
+                           HorizontalAlignment="Center" />
+
+                <ProgressBar x:Name="LoadingSpinner"
+                             IsVisible="False"
+                             IsIndeterminate="True"
+                             Width="30"
+                             Height="30"
+                             Foreground="{DynamicResource PrimaryBrush}"
+                             HorizontalAlignment="Center" />
+            </StackPanel>
+        
+    </Grid>
+</UserControl>

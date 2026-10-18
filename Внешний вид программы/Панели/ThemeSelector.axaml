@@ -1,0 +1,307 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="1040" d:DesignHeight="620"
+             x:Class="TinaPASS.Main.ThemeSelector">
+    
+    <Grid ColumnDefinitions="Auto,Auto" ColumnSpacing="16" Background="Transparent">
+
+        <!-- ========== МИНИ-ОКНО ПРЕДПРОСМОТРА ========== -->
+        <Border Grid.Column="1" x:Name="PreviewFrame"
+                Width="480" Height="320"
+                CornerRadius="14" ClipToBounds="True"
+                BorderBrush="#3A3A3A" BorderThickness="1"
+                VerticalAlignment="Center">
+            <Grid>
+                <!-- Фон (упрощённый превью эффекта) -->
+                <Border x:Name="PreviewBackground" Background="#0A192D"/>
+                <Grid RowDefinitions="34,*">
+                    <Border x:Name="PreviewTitleBar" Grid.Row="0" Background="#00000000"/>
+                    <Grid Grid.Row="1" ColumnDefinitions="110,*">
+                        <Border x:Name="PreviewSidebar" Background="#141414D0">
+                            <StackPanel Margin="10,12" Spacing="10">
+                                <Border x:Name="PreviewGroupActive" Width="88" Height="46" CornerRadius="10" Background="#FFFFFF22"/>
+                                <Border Width="88" Height="46" CornerRadius="10" Background="#FFFFFF14"/>
+                                <Border Width="88" Height="46" CornerRadius="10" Background="#FFFFFF14"/>
+                            </StackPanel>
+                        </Border>
+                        <StackPanel Grid.Column="1" Margin="14" Spacing="10">
+                            <Border x:Name="PreviewCard1" Height="58" CornerRadius="10" Background="#FFFFFF14"/>
+                            <Border x:Name="PreviewCard2" Height="58" CornerRadius="10" Background="#FFFFFF14"/>
+                            <Border x:Name="PreviewCard3" Height="58" CornerRadius="10" Background="#FFFFFF14"/>
+                        </StackPanel>
+                    </Grid>
+                </Grid>
+            </Grid>
+        </Border>
+
+        <Border Grid.Column="0" Background="#1A1A1A" 
+            CornerRadius="15" 
+            Padding="20"
+            BorderBrush="#2D2D2D"
+            BorderThickness="1"
+            MaxHeight="600"
+            Width="420">
+        
+        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+            <StackPanel Spacing="8">
+                
+                <!-- Заголовок -->
+                <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Center" Margin="0,0,0,10">
+                    <TextBlock Text="&#xE790;"
+                               FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                               FontSize="18"
+                               Foreground="White"
+                               VerticalAlignment="Center" />
+                    <TextBlock Text="Настройки оформления"
+                               FontSize="18"
+                               FontWeight="Bold"
+                               Foreground="White"
+                               VerticalAlignment="Center"/>
+                </StackPanel>
+                
+                <!-- ========== РАЗДЕЛ ФОНОВЫХ ЭФФЕКТОВ ========== -->
+                <TextBlock Text="━━━━━ Фоновый эффект ━━━━━"
+                           Foreground="#666"
+                           FontSize="12"
+                           HorizontalAlignment="Center"
+                           Margin="0,10,0,5"/>
+                
+                <!-- Океан -->
+                <Button x:Name="WaveOceanBtn"
+                        Background="#2D2D2D"
+                        Foreground="White"
+                        CornerRadius="8"
+                        Padding="12,8"
+                        Click="OnEffectClick"
+                        Tag="Океан"
+                        HorizontalAlignment="Stretch"
+                        Cursor="Hand">
+                    <Button.Styles>
+                        <Style Selector="Button:pointerover">
+                            <Setter Property="Background" Value="#3D3D3D"/>
+                        </Style>
+                    </Button.Styles>
+                    <StackPanel Orientation="Horizontal" Spacing="10">
+                        <TextBlock Text="&#xE774;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" FontSize="18" Width="30"/>
+                        <TextBlock Text="Океан" VerticalAlignment="Center" FontWeight="SemiBold"/>
+                        <TextBlock Text="&#xE73E;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Foreground="#4FC3F7" VerticalAlignment="Center" FontWeight="Bold" x:Name="WaveOceanCheck" IsVisible="False"/>
+                    </StackPanel>
+                </Button>
+                
+                <!-- Закат -->
+                <Button x:Name="WaveSunsetBtn"
+                        Background="#2D2D2D"
+                        Foreground="White"
+                        CornerRadius="8"
+                        Padding="12,8"
+                        Click="OnEffectClick"
+                        Tag="Закат"
+                        HorizontalAlignment="Stretch"
+                        Cursor="Hand">
+                    <Button.Styles>
+                        <Style Selector="Button:pointerover">
+                            <Setter Property="Background" Value="#3D3D3D"/>
+                        </Style>
+                    </Button.Styles>
+                    <StackPanel Orientation="Horizontal" Spacing="10">
+                        <TextBlock Text="&#xE771;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" FontSize="18" Width="30"/>
+                        <TextBlock Text="Закат" VerticalAlignment="Center" FontWeight="SemiBold"/>
+                        <TextBlock Text="&#xE73E;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Foreground="#FF8A5C" VerticalAlignment="Center" FontWeight="Bold" x:Name="WaveSunsetCheck" IsVisible="False"/>
+                    </StackPanel>
+                </Button>
+                
+                <!-- Неоновые волны -->
+                <Button x:Name="WaveNeonBtn"
+                        Background="#2D2D2D"
+                        Foreground="White"
+                        CornerRadius="8"
+                        Padding="12,8"
+                        Click="OnEffectClick"
+                        Tag="Неоновые волны"
+                        HorizontalAlignment="Stretch"
+                        Cursor="Hand">
+                    <Button.Styles>
+                        <Style Selector="Button:pointerover">
+                            <Setter Property="Background" Value="#3D3D3D"/>
+                        </Style>
+                    </Button.Styles>
+                    <StackPanel Orientation="Horizontal" Spacing="10">
+                        <TextBlock Text="&#xE949;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" FontSize="18" Width="30"/>
+                        <TextBlock Text="Неоновые волны" VerticalAlignment="Center" FontWeight="SemiBold"/>
+                        <TextBlock Text="&#xE73E;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Foreground="#00E5FF" VerticalAlignment="Center" FontWeight="Bold" x:Name="WaveNeonCheck" IsVisible="False"/>
+                    </StackPanel>
+                </Button>
+                
+                <!-- Лунная ночь -->
+                <Button x:Name="WaveMoonBtn"
+                        Background="#2D2D2D"
+                        Foreground="White"
+                        CornerRadius="8"
+                        Padding="12,8"
+                        Click="OnEffectClick"
+                        Tag="Лунная ночь"
+                        HorizontalAlignment="Stretch"
+                        Cursor="Hand">
+                    <Button.Styles>
+                        <Style Selector="Button:pointerover">
+                            <Setter Property="Background" Value="#3D3D3D"/>
+                        </Style>
+                    </Button.Styles>
+                    <StackPanel Orientation="Horizontal" Spacing="10">
+                        <TextBlock Text="&#xE708;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" FontSize="18" Width="30"/>
+                        <TextBlock Text="Лунная ночь" VerticalAlignment="Center" FontWeight="SemiBold"/>
+                        <TextBlock Text="&#xE73E;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Foreground="#B0C4DE" VerticalAlignment="Center" FontWeight="Bold" x:Name="WaveMoonCheck" IsVisible="False"/>
+                    </StackPanel>
+                </Button>
+                
+                <!-- Степь -->
+                <Button x:Name="WaveSteppeBtn"
+                        Background="#2D2D2D"
+                        Foreground="White"
+                        CornerRadius="8"
+                        Padding="12,8"
+                        Click="OnEffectClick"
+                        Tag="Степь"
+                        HorizontalAlignment="Stretch"
+                        Cursor="Hand">
+                    <Button.Styles>
+                        <Style Selector="Button:pointerover">
+                            <Setter Property="Background" Value="#3D3D3D"/>
+                        </Style>
+                    </Button.Styles>
+                    <StackPanel Orientation="Horizontal" Spacing="10">
+                        <TextBlock Text="&#xE780;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" FontSize="18" Width="30"/>
+                        <TextBlock Text="Степь" VerticalAlignment="Center" FontWeight="SemiBold"/>
+                        <TextBlock Text="&#xE73E;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Foreground="#66BB6A" VerticalAlignment="Center" FontWeight="Bold" x:Name="WaveSteppeCheck" IsVisible="False"/>
+                    </StackPanel>
+                </Button>
+                
+                <!-- Градиент -->
+                <Button x:Name="GradientBtn"
+                        Background="#2D2D2D"
+                        Foreground="White"
+                        CornerRadius="8"
+                        Padding="12,8"
+                        Click="OnEffectClick"
+                        Tag="Градиент"
+                        HorizontalAlignment="Stretch"
+                        Cursor="Hand">
+                    <Button.Styles>
+                        <Style Selector="Button:pointerover">
+                            <Setter Property="Background" Value="#3D3D3D"/>
+                        </Style>
+                    </Button.Styles>
+                    <StackPanel Orientation="Horizontal" Spacing="10">
+                        <TextBlock Text="&#xE774;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" FontSize="18" Width="30"/>
+                        <TextBlock Text="Градиент" VerticalAlignment="Center" FontWeight="SemiBold"/>
+                        <TextBlock Text="&#xE73E;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Foreground="#5AC8FF" VerticalAlignment="Center" FontWeight="Bold" x:Name="GradientCheck" IsVisible="False"/>
+                    </StackPanel>
+                </Button>
+
+                <!-- Градиент 2 (чистый) -->
+                <Button x:Name="Gradient2Btn"
+                        Background="#2D2D2D"
+                        Foreground="White"
+                        CornerRadius="8"
+                        Padding="12,8"
+                        Click="OnEffectClick"
+                        Tag="Градиент 2"
+                        HorizontalAlignment="Stretch"
+                        Cursor="Hand">
+                    <Button.Styles>
+                        <Style Selector="Button:pointerover">
+                            <Setter Property="Background" Value="#3D3D3D"/>
+                        </Style>
+                    </Button.Styles>
+                    <StackPanel Orientation="Horizontal" Spacing="10">
+                        <TextBlock Text="&#xE77B;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" FontSize="18" Width="30"/>
+                        <TextBlock Text="Градиент 2" VerticalAlignment="Center" FontWeight="SemiBold"/>
+                        <TextBlock Text="&#xE73E;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Foreground="#6FBFFF" VerticalAlignment="Center" FontWeight="Bold" x:Name="Gradient2Check" IsVisible="False"/>
+                    </StackPanel>
+                </Button>
+
+                <!-- Неон (Figma) -->
+                <Button x:Name="WaveFigmaBtn"
+                        Background="#2D2D2D"
+                        Foreground="White"
+                        CornerRadius="8"
+                        Padding="12,8"
+                        Click="OnEffectClick"
+                        Tag="Figma (неон)"
+                        HorizontalAlignment="Stretch"
+                        Cursor="Hand">
+                    <Button.Styles>
+                        <Style Selector="Button:pointerover">
+                            <Setter Property="Background" Value="#3D3D3D"/>
+                        </Style>
+                    </Button.Styles>
+                    <StackPanel Orientation="Horizontal" Spacing="10">
+                        <TextBlock Text="&#xE949;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" FontSize="18" Width="30"/>
+                        <TextBlock Text="Figma (неон)" VerticalAlignment="Center" FontWeight="SemiBold"/>
+                        <TextBlock Text="&#xE73E;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Foreground="#FE01A4" VerticalAlignment="Center" FontWeight="Bold" x:Name="WaveFigmaCheck" IsVisible="False"/>
+                    </StackPanel>
+                </Button>
+
+                <!-- ========== КНОПКА ПРИМЕНЕНИЯ ========== -->
+                <Border x:Name="ApplyWrapper"
+                        Height="0"
+                        Opacity="0"
+                        IsHitTestVisible="False"
+                        ClipToBounds="True"
+                        HorizontalAlignment="Stretch">
+                    <Border.Transitions>
+                        <Transitions>
+                            <DoubleTransition Property="Height" Duration="0:0:0.2" Easing="CubicEaseOut"/>
+                            <DoubleTransition Property="Opacity" Duration="0:0:0.2" Easing="CubicEaseOut"/>
+                        </Transitions>
+                    </Border.Transitions>
+                    <Button x:Name="ApplyBtn"
+                            Background="#2E7D32"
+                            Foreground="White"
+                            CornerRadius="8"
+                            Padding="12,10"
+                            Click="OnApplyClick"
+                            HorizontalAlignment="Stretch"
+                            VerticalAlignment="Top"
+                            Margin="0,10,0,0"
+                            Cursor="Hand">
+                        <Button.Styles>
+                            <Style Selector="Button:pointerover">
+                                <Setter Property="Background" Value="#3C9E43"/>
+                            </Style>
+                        </Button.Styles>
+                        <StackPanel Orientation="Horizontal" Spacing="6" HorizontalAlignment="Center">
+                            <TextBlock Text="&#xE73E;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" VerticalAlignment="Center" FontWeight="SemiBold"/>
+                            <TextBlock Text="Применить" VerticalAlignment="Center" FontWeight="SemiBold"/>
+                        </StackPanel>
+                    </Button>
+                </Border>
+
+                <!-- ========== КНОПКА ОТМЕНЫ ========== -->
+                <Button x:Name="CloseBtn"
+                        Background="#FF4444"
+                        Foreground="White"
+                        CornerRadius="8"
+                        Padding="12,10"
+                        Click="OnCloseClick"
+                        HorizontalAlignment="Stretch"
+                        Margin="0,8,0,0"
+                        Cursor="Hand">
+                    <Button.Styles>
+                        <Style Selector="Button:pointerover">
+                            <Setter Property="Background" Value="#FF6666"/>
+                        </Style>
+                    </Button.Styles>
+                    <StackPanel Orientation="Horizontal" Spacing="6" HorizontalAlignment="Center">
+                        <TextBlock Text="&#xE711;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" VerticalAlignment="Center" FontWeight="SemiBold"/>
+                        <TextBlock Text="Отмена" VerticalAlignment="Center" FontWeight="SemiBold"/>
+                    </StackPanel>
+                </Button>
+                
+            </StackPanel>
+        </ScrollViewer>
+        </Border>
+    </Grid>
+</UserControl>

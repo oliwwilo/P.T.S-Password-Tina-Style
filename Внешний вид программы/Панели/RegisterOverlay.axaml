@@ -1,0 +1,102 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="TinaPASS.Main.RegisterOverlay"
+             >
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!-- Заголовок -->
+        <TextBlock Grid.Row="0"
+                   Text="Регистрация"
+                   FontSize="28"
+                   FontWeight="Bold"
+                   Foreground="{DynamicResource AccentBrush}"
+                   HorizontalAlignment="Center"
+                   Margin="0,10,0,20" />
+
+        <!-- Поле Email -->
+        <TextBox x:Name="EmailBox"
+                 Grid.Row="1"
+                 Watermark="Email"
+                 Background="{DynamicResource SurfaceBrush}"
+                 CornerRadius="8"
+                 Padding="12"
+                 Margin="0,5,0,5" />
+
+        <!-- Поле Пароль -->
+        <TextBox x:Name="PasswordBox"
+                 Grid.Row="2"
+                 Watermark="Пароль (минимум 6 символов)"
+                 Background="{DynamicResource SurfaceBrush}"
+                 CornerRadius="8"
+                 Padding="12"
+                 Margin="0,5,0,5"
+                 PasswordChar="●" />
+
+        <!-- Поле Подтверждение пароля -->
+        <TextBox x:Name="ConfirmPasswordBox"
+                 Grid.Row="3"
+                 Watermark="Подтвердите пароль"
+                 Background="{DynamicResource SurfaceBrush}"
+                 Foreground="White"
+                 CornerRadius="8"
+                 Padding="12"
+                 Margin="0,5,0,5"
+                 PasswordChar="●" />
+
+        <!-- Сообщение об ошибке -->
+        <TextBlock x:Name="ErrorMessageText"
+                   Grid.Row="4"
+                   Text=""
+                   Foreground="#FF4444"
+                   FontSize="13"
+                   TextWrapping="Wrap"
+                   Margin="0,5,0,5"
+                   IsVisible="False" />
+
+        <!-- Сообщение об успехе -->
+        <TextBlock x:Name="SuccessMessageText"
+                   Grid.Row="5"
+                   Text=""
+                   Foreground="{DynamicResource SuccessBrush}"
+                   FontSize="13"
+                   TextWrapping="Wrap"
+                   Margin="0,5,0,5"
+                   IsVisible="False" />
+
+        <!-- Кнопка регистрации -->
+        <Button x:Name="RegisterButton"
+                Grid.Row="6"
+                Content="Зарегистрироваться"
+                Background="{DynamicResource PrimaryBrush}"
+                CornerRadius="8"
+                Height="45"
+                FontSize="16"
+                FontWeight="Bold"
+                Margin="0,15,0,10"
+                Click="OnRegisterClick" />
+
+        <!-- Кнопка назад -->
+        <Button x:Name="BackButton"
+                Grid.Row="7"
+                Content="← Назад"
+                Background="Transparent"
+                Foreground="{DynamicResource TextSecondaryBrush}"
+                CornerRadius="8"
+                Height="35"
+                FontSize="13"
+                Margin="0,5,0,10"
+                Click="OnBackClick" />
+    </Grid>
+</UserControl>

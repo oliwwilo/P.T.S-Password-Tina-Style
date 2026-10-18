@@ -1,0 +1,158 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="TinaPASS.Main.PassCardRed">
+
+    <Grid>
+        <Border Background="#80000000"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Stretch"
+                Margin="0,33,0,0" />
+
+        <Border Background="Transparent" Tapped="OnOverlayTapped" Margin="0,33,0,0" />
+
+        <Border Background="{DynamicResource SurfaceLightBrush}"
+                CornerRadius="20"
+                Padding="25"
+                Width="400"
+                BorderBrush="{DynamicResource PrimaryBrush}"
+                BorderThickness="2"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center">
+
+            <StackPanel Spacing="15">
+
+                <TextBlock x:Name="TitleText"
+                           Text="Новый пароль"
+                           FontSize="20"
+                           FontFamily="Inter"
+                           FontWeight="ExtraBold"
+                           Foreground="{DynamicResource PrimaryBrush}"
+                           HorizontalAlignment="Center" />
+
+                <!-- Название -->
+                <TextBlock Text="Название" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="14" FontWeight="SemiBold" />
+                <TextBox x:Name="TitleBox"
+                         Watermark="Введите название"
+                         Background="{DynamicResource SurfaceBrush}"
+                         CornerRadius="10"
+                         Padding="15" />
+
+                <!-- Email -->
+                <TextBlock Text="Почта" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="14" FontWeight="SemiBold" />
+                <Grid ColumnDefinitions="*,Auto" Margin="0,5,0,0">
+                    <TextBox x:Name="EmailBox"
+                             Grid.Column="0"
+                             Watermark="example@mail.com"
+                             Background="{DynamicResource SurfaceBrush}"
+                             CornerRadius="10"
+                             Padding="15" />
+                    <Button x:Name="CopyEmailButton"
+                            Grid.Column="1"
+                            Content="&#xE8C8;"
+                            FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                            Width="40"
+                            Height="36"
+                            Margin="8,0,0,0"
+                            CornerRadius="8"
+                            Background="{DynamicResource SuccessBrush}"
+                            FontSize="16"
+                            Cursor="Hand"
+                            Click="OnCopyEmailClick"
+                            ToolTip.Tip="Скопировать почту" />
+                </Grid>
+
+                <!-- Логин -->
+                <TextBlock Text="Логин" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="14" FontWeight="SemiBold" />
+                <Grid ColumnDefinitions="*,Auto" Margin="0,5,0,0">
+                    <TextBox x:Name="LoginBox"
+                             Grid.Column="0"
+                             Watermark="Введите логин"
+                             Background="{DynamicResource SurfaceBrush}"
+                             CornerRadius="10"
+                             Padding="15" />
+                    <Button x:Name="CopyLoginButton"
+                            Grid.Column="1"
+                            Content="&#xE8C8;"
+                            FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                            Width="40"
+                            Height="36"
+                            Margin="8,0,0,0"
+                            CornerRadius="8"
+                            Background="{DynamicResource SuccessBrush}"
+                            FontSize="16"
+                            Cursor="Hand"
+                            Click="OnCopyLoginClick"
+                            ToolTip.Tip="Скопировать логин" />
+                </Grid>
+
+                <!-- Пароль -->
+                <TextBlock Text="Пароль" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="14" FontWeight="SemiBold" />
+                <Grid ColumnDefinitions="*,Auto,Auto" Margin="0,5,0,0">
+                    <TextBox x:Name="PasswordBox"
+                             Grid.Column="0"
+                             Watermark="Пароль"
+                             Background="{DynamicResource SurfaceBrush}"
+                             CornerRadius="8"
+                             Padding="12,10" />
+                    <Button x:Name="GeneratePasswordButton"
+                            Grid.Column="1"
+                            Content="&#xE72C;"
+                            FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                            Width="40"
+                            Height="36"
+                            Margin="8,0,0,0"
+                            CornerRadius="8"
+                            Background="{DynamicResource PrimaryBrush}"
+                            FontSize="16"
+                            Cursor="Hand"
+                            Click="OnGeneratePasswordClick"
+                            ToolTip.Tip="Сгенерировать пароль" />
+                    <Button x:Name="CopyPasswordButton"
+                            Grid.Column="2"
+                            Content="&#xE8C8;"
+                            FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                            Width="40"
+                            Height="36"
+                            Margin="8,0,0,0"
+                            CornerRadius="8"
+                            Background="{DynamicResource SuccessBrush}"
+                            FontSize="16"
+                            Cursor="Hand"
+                            Click="OnCopyPasswordClick"
+                            ToolTip.Tip="Скопировать пароль" />
+                </Grid>
+
+                <!-- Описание -->
+                <TextBlock Text="Описание (необязательно)" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="14" FontWeight="SemiBold" />
+                <TextBox x:Name="DescriptionBox"
+                         Watermark="Дополнительная информация"
+                         Background="{DynamicResource SurfaceBrush}"
+                         CornerRadius="10"
+                         Padding="15"
+                         AcceptsReturn="True"
+                         TextWrapping="Wrap"
+                         MaxHeight="80" />
+
+                <!-- Кнопки -->
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="10" Margin="0,20,0,0">
+                    <Button Grid.Column="0"
+                            Content="Отмена"
+                            Height="40"
+                            CornerRadius="10"
+                            Background="{DynamicResource SurfaceBrush}"
+                            Foreground="{DynamicResource TextSecondaryBrush}"
+                            Click="OnCancelClick" />
+                    <Button Grid.Column="1"
+                            Content="Сохранить"
+                            Height="40"
+                            CornerRadius="10"
+                            Background="{DynamicResource PrimaryBrush}"
+                            Foreground="Black"
+                            FontWeight="Bold"
+                            Click="OnSaveClick" />
+                </Grid>
+
+            </StackPanel>
+        </Border>
+    </Grid>
+</UserControl>

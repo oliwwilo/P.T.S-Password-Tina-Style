@@ -1,0 +1,105 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="TinaPASS.Main.CreateGroupPanel">
+
+    <Grid>
+        <Border Background="#80000000"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Stretch"
+                Margin="0,33,0,0" />
+
+        <Border Background="Transparent" Tapped="OnOverlayTapped" Margin="0,33,0,0" />
+
+        <Border Background="{DynamicResource SurfaceBrush}"
+                CornerRadius="20"
+                Padding="25"
+                Width="350"
+                BorderBrush="{DynamicResource PrimaryBrush}"
+                BorderThickness="2"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center">
+
+            <StackPanel Spacing="15">
+
+                <TextBlock Text="Новая группа"
+                           FontFamily="{StaticResource PixelFont}"
+                           FontSize="77"
+                           FontWeight="Normal"
+                           Foreground="{DynamicResource AccentBrush}"
+                           HorizontalAlignment="Center" />
+
+                <!-- ВЫБОР ФОТО -->
+                <TextBlock Text="Фото группы"
+                           Foreground="{DynamicResource TextSecondaryBrush}"
+                           FontSize="14"
+                           FontWeight="SemiBold" 
+                           Margin="100,0,0,0"/>
+
+                <Border x:Name="PhotoPreview"
+                        Width="200"
+                        Height="200"
+                        CornerRadius="10"
+                        Background="{DynamicResource SurfaceBrush}"
+                        BorderBrush="{DynamicResource PrimaryBrush}"
+                        BorderThickness="1"
+                        Cursor="Hand"
+                        HorizontalAlignment="Center"
+                        PointerEntered="OnPhotoPreviewEnter"
+                        PointerExited="OnPhotoPreviewLeave"
+                        Tapped="OnPhotoPreviewTapped"
+                        ClipToBounds="True">
+                    <Panel>
+                        <TextBlock x:Name="PhotoPreviewText"
+                                   Text=""
+                                   FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                                   FontSize="100"
+                                   Foreground="{DynamicResource PrimaryBrush}"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center" />
+                        <TextBlock x:Name="PhotoPreviewHint"
+                                   Text="Нажмите чтобы выбрать фото"
+                                   FontSize="12"
+                                   Foreground="{DynamicResource PrimaryBrush}"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Bottom"
+                                   Margin="0,0,0,8"
+                                   IsVisible="False" />
+                    </Panel>
+                </Border>
+
+                <!-- Название группы -->
+                <TextBlock Text="Название группы"
+                           Foreground="{DynamicResource TextSecondaryBrush}"
+                           FontSize="14"
+                           FontWeight="SemiBold"
+                           Margin="80,10,0,0" />
+
+                <TextBox x:Name="GroupNameBox"
+                         Watermark="Введите название"
+                         FontSize="14"
+                         Background="{DynamicResource SurfaceBrush}"
+                         CornerRadius="10"
+                         Padding="15" />
+
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                    <Button Grid.Column="0"
+                            Content="Отмена"
+                            Height="40"
+                            CornerRadius="10"
+                            Background="{DynamicResource SurfaceBrush}"
+                            Foreground="{DynamicResource TextSecondaryBrush}"
+                            Click="OnCancelClick" />
+                    <Button Grid.Column="1"
+                            Content="Создать"
+                            Height="40"
+                            CornerRadius="10"
+                            Background="{DynamicResource PrimaryBrush}"
+                            Foreground="Black"
+                            FontWeight="Bold"
+                            Margin="60,0,0,0"
+                            Click="OnCreateClick" />
+                </Grid>
+            </StackPanel>
+        </Border>
+    </Grid>
+</UserControl>

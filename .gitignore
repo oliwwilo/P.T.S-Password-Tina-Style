@@ -1,0 +1,27 @@
+﻿# Сборка и готовые exe
+bin/
+obj/
+publish/
+publish_win_x64/
+publish_win_x64_single/
+Один файл/
+Релиз/
+Для_переноса/
+Версия для запуска/
+
+# IDE
+.vs/
+.idea/
+*.user
+*.DotSettings.user
+
+# Старый шаблон, не входит в решение
+MyApp/
+
+# Секреты — никогда не коммитить
+api.php
+
+# База данных и системный мусор
+*.db
+.DS_Store
+Thumbs.db

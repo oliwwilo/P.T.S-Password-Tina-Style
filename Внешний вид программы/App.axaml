@@ -1,0 +1,141 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:sys="using:System"
+             x:Class="TinaPASS.Main.App"
+             RequestedThemeVariant="Default">
+    <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
+
+    <Application.Styles>
+        <FluentTheme />
+
+        <!-- ===== Глобальный шрифт в стиле Figma (Inter = родной шрифт Figma) ===== -->
+        <Style Selector="TextBlock">
+            <Setter Property="FontFamily" Value="Inter" />
+        </Style>
+        <Style Selector="TextBox">
+            <Setter Property="FontFamily" Value="Inter" />
+        </Style>
+        <Style Selector="Button">
+            <Setter Property="FontFamily" Value="Inter" />
+        </Style>
+        <Style Selector="Button">
+            <Setter Property="Background" Value="Transparent" />
+        </Style>
+        <!-- ===== Плавное белое выделение при наведении на все кнопки ===== -->
+        <Style Selector="Button /template/ ContentPresenter">
+            <Setter Property="Transitions">
+                <Transitions>
+                    <BrushTransition Property="Background"
+                                     Duration="0:0:0.3"
+                                     Easing="CubicEaseOut" />
+                </Transitions>
+            </Setter>
+        </Style>
+        <Style Selector="Button:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#33FFFFFF" />
+        </Style>
+        <Style Selector="Button:pressed /template/ ContentPresenter">
+            <Setter Property="Background" Value="#55FFFFFF" />
+        </Style>
+
+        <!-- ===== Steam-стиль скроллбара ===== -->
+        <!-- Дорожка: тёмная полупрозрачная «шахта» -->
+        <Style Selector="ScrollBar">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="AllowAutoHide" Value="False" />
+        </Style>
+        <Style Selector="ScrollBar /template/ Rectangle#TrackRect">
+            <Setter Property="Fill" Value="{DynamicResource ScrollBarTrackBrush}" />
+            <Setter Property="Opacity" Value="1" />
+            <!-- Радиус скругления концов барьера (половина толщины, для толщины 16 → 8) -->
+            <Setter Property="RadiusX" Value="8" />
+            <Setter Property="RadiusY" Value="8" />
+        </Style>
+        <!-- Скрываем стрелки на концах скроллбара -->
+        <Style Selector="ScrollBar /template/ RepeatButton#PART_LineUpButton">
+            <Setter Property="IsVisible" Value="False" />
+        </Style>
+        <Style Selector="ScrollBar /template/ RepeatButton#PART_LineDownButton">
+            <Setter Property="IsVisible" Value="False" />
+        </Style>
+        <!-- Ползунок: скруглённый, в акцентном цвете темы -->
+        <Style Selector="ScrollBar /template/ Thumb">
+            <Setter Property="Background" Value="{DynamicResource ScrollBarThumbBrush}" />
+            <Setter Property="CornerRadius" Value="8" />
+            <Setter Property="MinWidth" Value="2" />
+            <Setter Property="MinHeight" Value="2" />
+        </Style>
+
+        <!-- ===== Тултип-«табличка»: белая плашка с хвостиком слева ===== -->
+        <Style Selector="ToolTip">
+            <Setter Property="Padding" Value="19,9,12,9" />
+            <Setter Property="Foreground" Value="#1B1B22" />
+            <Setter Property="FontFamily" Value="Inter" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <Panel>
+                        <Panel.Effect>
+                            <DropShadowEffect OffsetX="0" OffsetY="5" BlurRadius="18" Color="#000000" Opacity="0.5" />
+                        </Panel.Effect>
+                        <!-- Тело плашки: цельный белый корпус без рамки -->
+                        <Border Margin="7,0,0,0"
+                                Background="#FFFFFFFF"
+                                CornerRadius="6" />
+                        <!-- Хвостик, указывающий влево (заходит внутрь корпуса; кончик слегка скруглён) -->
+                        <Path Data="M10,0 L1.3,6.09 Q0,7 1.3,7.91 L10,14 Z"
+                              Fill="#FFFFFFFF"
+                              Width="10"
+                              Height="14"
+                              Stretch="None"
+                              HorizontalAlignment="Left"
+                              VerticalAlignment="Center" />
+                        <ContentPresenter Name="PART_ContentPresenter"
+                                          Margin="{TemplateBinding Padding}"
+                                          HorizontalAlignment="Stretch"
+                                          HorizontalContentAlignment="Center"
+                                          VerticalAlignment="Center"
+                                          Content="{TemplateBinding Content}"
+                                          ContentTemplate="{TemplateBinding ContentTemplate}"
+                                          TextElement.Foreground="{TemplateBinding Foreground}" />
+                    </Panel>
+                </ControlTemplate>
+            </Setter>
+        </Style>
+    </Application.Styles>
+    <Application.Resources>
+        <!-- ТОЛЩИНА СКРОЛЛБАРА (ширина вертикального / высота горизонтального). Меньше число = тоньше. -->
+        <sys:Double x:Key="ScrollBarSize">4</sys:Double>
+        <!-- ЦВЕТА СКРОЛЛБАРА: меняйте Color="..." на нужный hex/rgb -->
+        <SolidColorBrush x:Key="ScrollBarThumbBrush" Color="#A2A2A2" />        <!-- цвет ползунка -->
+        <SolidColorBrush x:Key="ScrollBarTrackBrush" Color="Transparent" />        <!-- цвет дорожки -->
+        <!-- Переопределение ресурсов Fluent-темы для ползунка -->
+        <SolidColorBrush x:Key="ScrollBarPanningThumbBackground" Color="#A2A2A2" />
+        <SolidColorBrush x:Key="ScrollBarThumbFillPointerOver" Color="#A2A2A2" />
+        <SolidColorBrush x:Key="ScrollBarThumbFillPressed" Color="#A2A2A2" />
+        <SolidColorBrush x:Key="ScrollBarThumbBackgroundColor" Color="#A2A2A2" />
+        <!-- Прозрачные фоны самого ScrollBar (серый/чёрный уходит) -->
+        <SolidColorBrush x:Key="ScrollBarBackground" Color="Transparent" />
+        <SolidColorBrush x:Key="ScrollBarBackgroundPointerOver" Color="Transparent" />
+        <SolidColorBrush x:Key="ScrollBarBorderBrush" Color="Transparent" />
+        <SolidColorBrush x:Key="ScrollBarBorderBrushPointerOver" Color="Transparent" />
+        <!-- Ваши ресурсы шрифтов -->
+        
+        <!-- Пиксельный шрифт был битый (пустая таблица имён) — Avalonia ронял приложение.
+             Используем проверенный 42dot Sans. Можно заменить на рабочую OTF/TTF с нормальными метаданными. -->
+        <FontFamily x:Key="PixelFont">Inter</FontFamily>
+        <!-- СТЕКЛО КАРТОЧЕК ПАРОЛЕЙ: эффект "как в Фигме".
+             Рисуется как: TintColor с прозрачностью (заливка стекла) + размытие фона (MaterialOpacity)
+             + обводка 1px белым (задана у карточки в коде). Настройки фигмы:
+             TintColor = цвет заливки (белый, низкая прозрачность), TintOpacity = сила заливки,
+             MaterialOpacity = степень размытия (меньше = прозрачнее). FallbackColor — цвет,
+             если размытие недоступно на платформе. -->
+        <ExperimentalAcrylicMaterial x:Key="PasswordCardGlass"
+                                     BackgroundSource="None"
+                                     TintColor="Black"
+                                     TintOpacity="0.60"
+                                     MaterialOpacity="0.90"
+                                     FallbackColor="#0A0A10"/>
+    </Application.Resources>
+</Application>
