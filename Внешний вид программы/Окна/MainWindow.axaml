@@ -5,7 +5,7 @@
         xmlns:local="clr-namespace:TinaPASS.Main"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="TinaPASS.Main.MainWindow"
-        Title="P.T.S Password Tina Style"
+        Title=""
         Icon="/Assets/Логотип.ico"
         TransparencyLevelHint="AcrylicBlur"
         Background="Transparent"
