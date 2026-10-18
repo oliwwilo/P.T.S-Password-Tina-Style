@@ -5,7 +5,7 @@
         xmlns:local="clr-namespace:TinaPASS.Main"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="TinaPASS.Main.MainWindow"
-        Title=""
+        Title="P.T.S Password Tina Style"
         Icon="/Assets/Логотип.ico"
         TransparencyLevelHint="AcrylicBlur"
         Background="Transparent"
@@ -673,7 +673,7 @@ Padding="10,5"
                           Width="20"
                           Height="20"
                           Stretch="Uniform" />
-                    <TextBlock Text="T.P.S ver 1.0"
+                    <TextBlock Text="P.T.S ver 1.0"
                                LetterSpacing="2"
                                Foreground="White"
                                FontSize="12"
@@ -861,7 +861,7 @@ Padding="10,5"
                             </LinearGradientBrush>
                         </Path.Fill>
                     </Path>
-                    <TextBlock Text="T.P.S ver 1.0"
+                    <TextBlock Text="P.T.S Password Tina Style ver 1.0"
                                LetterSpacing="2"
                                Foreground="White"
                                FontSize="12"
