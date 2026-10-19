@@ -9,7 +9,6 @@ namespace TinaPASS.Main
     /// <summary>
     /// Импорт паролей из текстового файла.
     /// Формат строки: "Название PASSWORD пароль NAME логин EMAIL почта"
-    /// (знак "=" перед маркером необязателен и допускается для совместимости)
     /// </summary>
     public static class PasswordImporter
     {
