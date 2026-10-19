@@ -320,8 +320,8 @@ public partial class MainWindow
 
             var numberBadge = new Border
             {
-                Background = Brush.Parse("#1A22C55E"),
-                BorderBrush = Brush.Parse("#86EFAC"),
+                Background = Brush.Parse("#2622C55E"),
+                BorderBrush = Brush.Parse("#4ADE80"),
                 BorderThickness = new Thickness(1),
                 CornerRadius = new CornerRadius(8),
                 Width = 28,
@@ -334,7 +334,7 @@ public partial class MainWindow
                 Text = number.ToString(),
                 FontSize = 13,
                 FontWeight = FontWeight.Medium,
-                Foreground = Brush.Parse("#86EFAC"),
+                Foreground = Brush.Parse("#4ADE80"),
                 HorizontalAlignment = HorizontalAlignment.Center,
                 VerticalAlignment = VerticalAlignment.Center
             };
