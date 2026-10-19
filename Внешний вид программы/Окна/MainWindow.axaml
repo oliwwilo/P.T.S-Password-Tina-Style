@@ -458,11 +458,20 @@ MinHeight="400"
            Height="36"
            Cursor="Hand"
            IsVisible="False">
-       <Button.Styles>
-           <Style Selector="Button:pointerover">
-               <Setter Property="Background" Value="#1AEF4444" />
-               <Setter Property="Foreground" Value="#FCA5A5" />
-           </Style>
+        <Button.Styles>
+            <Style Selector="Button">
+                <Setter Property="Foreground" Value="#CFCFCF" />
+                <Setter Property="Transitions">
+                    <Transitions>
+                        <BrushTransition Property="Background" Duration="0:0:0.15" />
+                        <BrushTransition Property="Foreground" Duration="0:0:0.15" />
+                    </Transitions>
+                </Setter>
+            </Style>
+            <Style Selector="Button:pointerover">
+                <Setter Property="Background" Value="#1AEF4444" />
+                <Setter Property="Foreground" Value="#FCA5A5" />
+            </Style>
            <Style Selector="Button:pressed">
                <Setter Property="Background" Value="#33EF4444" />
                <Setter Property="Foreground" Value="#FCA5A5" />
@@ -555,7 +564,9 @@ MinHeight="400"
             HorizontalAlignment="Stretch"
             Height="30"
             Margin="140,190,30,0"
-            Background="Transparent">
+            Background="Transparent"
+            BorderBrush="White"
+            BorderThickness="0,0,0,1">
         <Grid ColumnDefinitions="Auto,*,Auto">
             <Border x:Name="SearchIconBorder"
                     Grid.Column="0"
@@ -621,14 +632,6 @@ MinHeight="400"
             </Button>
         </Grid>
     </Border>
-    <Border x:Name="SearchUnderline"
-            Height="1"
-            Background="White"
-            HorizontalAlignment="Stretch"
-            Margin="180,1,30,0"
-            RelativePanel.Below="SearchBar"
-            RelativePanel.AlignLeftWithPanel="True"
-            RelativePanel.AlignRightWithPanel="True"/>
             <!-- Выдвижная панель вынесена на верхний слой (см. ниже) -->
 
             <!-- ОТКЛЮЧЕНОООООООООООООООООООООООООООООООООООО -->

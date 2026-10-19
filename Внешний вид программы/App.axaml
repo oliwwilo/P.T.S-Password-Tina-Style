@@ -134,8 +134,8 @@
         <ExperimentalAcrylicMaterial x:Key="PasswordCardGlass"
                                      BackgroundSource="None"
                                      TintColor="Black"
-                                     TintOpacity="0.60"
-                                     MaterialOpacity="0.90"
+                                     TintOpacity="0.35"
+                                     MaterialOpacity="0.45"
                                      FallbackColor="#0A0A10"/>
     </Application.Resources>
 </Application>
