@@ -243,7 +243,7 @@ public partial class MainWindow
 
             var card = new Border
             {
-                Background = Brush.Parse("#33000000"),
+                Background = Brush.Parse("#FF1A1A2E"),
                 CornerRadius = new CornerRadius(14),
                 BorderThickness = new Thickness(0),
                 BoxShadow = new BoxShadows(new BoxShadow
@@ -396,6 +396,7 @@ public partial class MainWindow
                 VerticalAlignment = VerticalAlignment.Center,
                 Cursor = new Cursor(StandardCursorType.Hand)
             };
+            deleteButton.Click += OnDeleteClick;
             deleteButton.Styles.Add(new Style(x => x.OfType<Button>())
             {
                 Setters =
@@ -470,17 +471,7 @@ public partial class MainWindow
             Grid.SetColumn(info, 1);
             Grid.SetColumn(actions, 2);
 
-            var glass = new ExperimentalAcrylicBorder
-            {
-                CornerRadius = new CornerRadius(14),
-                Child = grid
-            };
-
-            object? material = null;
-            Application.Current?.TryFindResource("PasswordCardGlass", null, out material);
-            glass.Material = material as ExperimentalAcrylicMaterial;
-
-            card.Child = glass;
+            card.Child = grid;
             return card;
         }
         catch (Exception ex)
@@ -495,7 +486,7 @@ public partial class MainWindow
         int number = 1;
         foreach (var child in PasswordsContainer.Children)
         {
-            if (child is Border { Child: ExperimentalAcrylicBorder { Child: Grid grid } })
+            if (child is Border { Child: Grid grid })
             {
                 foreach (var gridChild in grid.Children)
                 {
