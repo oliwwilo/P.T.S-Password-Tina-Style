@@ -246,14 +246,6 @@ public partial class MainWindow
                 Background = Brush.Parse("#33000000"),
                 CornerRadius = new CornerRadius(14),
                 BorderThickness = new Thickness(0),
-                BoxShadow = new BoxShadows(new BoxShadow
-                {
-                    OffsetX = 0,
-                    OffsetY = 10,
-                    Blur = 28,
-                    Spread = 0,
-                    Color = Color.FromArgb(60, 0, 0, 0)
-                }),
                 Margin = new Thickness(0, 0, 0, 10),
                 Tag = password,
                 Transitions = new Transitions
@@ -477,17 +469,7 @@ public partial class MainWindow
             Grid.SetColumn(info, 1);
             Grid.SetColumn(actions, 2);
 
-            var glass = new ExperimentalAcrylicBorder
-            {
-                CornerRadius = new CornerRadius(14),
-                Child = grid
-            };
-
-            object? material = null;
-            Application.Current?.TryFindResource("PasswordCardGlass", null, out material);
-            glass.Material = material as ExperimentalAcrylicMaterial;
-
-            card.Child = glass;
+            card.Child = grid;
             return card;
         }
         catch (Exception ex)
@@ -513,7 +495,7 @@ public partial class MainWindow
         int number = 1;
         foreach (var child in PasswordsContainer.Children)
         {
-            if (child is Border { Child: ExperimentalAcrylicBorder { Child: Grid grid } })
+            if (child is Border { Child: Grid grid })
             {
                 foreach (var gridChild in grid.Children)
                 {

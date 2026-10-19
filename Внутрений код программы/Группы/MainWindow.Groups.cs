@@ -84,7 +84,7 @@ public partial class MainWindow
     // поэтому раскрытие всегда возвращает всё ровно в исходный размер/позиции.
     private bool _groupsBaseCaptured = false;
     private double _groupsNormalWidth = 100;
-    private const double GroupsWideWidth = 180;
+    private const double GroupsWideWidth = 260;
     private Thickness _baseSmenaslo;
     private Thickness _baseSearchBar;
 
