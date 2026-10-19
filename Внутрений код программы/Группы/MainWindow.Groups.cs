@@ -86,10 +86,7 @@ public partial class MainWindow
     private double _groupsNormalWidth = 100;
     private const double GroupsWideWidth = 180;
     private Thickness _baseSmenaslo;
-    private Thickness _baseSearchBox;
-    private Thickness _baseSearchOverlay;
-    private Thickness _baseSearchIcon;
-    private Thickness _baseUnderline;
+    private Thickness _baseSearchBar;
 
     private void CaptureGroupsBase()
     {
@@ -100,10 +97,7 @@ public partial class MainWindow
             if (_groupsNormalWidth <= 0) _groupsNormalWidth = 100;
         }
         if (smenaslo != null) _baseSmenaslo = smenaslo.Margin;
-        if (SearchBox != null) _baseSearchBox = SearchBox.Margin;
-        if (SearchPlaceholderOverlay != null) _baseSearchOverlay = SearchPlaceholderOverlay.Margin;
-        if (SearchIconPath != null) _baseSearchIcon = SearchIconPath.Margin;
-        if (SearchUnderline != null) _baseUnderline = SearchUnderline.Margin;
+        if (SearchBar != null) _baseSearchBar = SearchBar.Margin;
         _groupsBaseCaptured = true;
     }
 
@@ -214,14 +208,8 @@ public partial class MainWindow
     {
         if (smenaslo != null)
             smenaslo.Margin = new Thickness(_baseSmenaslo.Left + delta, _baseSmenaslo.Top, _baseSmenaslo.Right, _baseSmenaslo.Bottom);
-        if (SearchBox != null)
-            SearchBox.Margin = new Thickness(_baseSearchBox.Left + delta, _baseSearchBox.Top, _baseSearchBox.Right, _baseSearchBox.Bottom);
-        if (SearchPlaceholderOverlay != null)
-            SearchPlaceholderOverlay.Margin = new Thickness(_baseSearchOverlay.Left + delta, _baseSearchOverlay.Top, _baseSearchOverlay.Right, _baseSearchOverlay.Bottom);
-        if (SearchIconPath != null)
-            SearchIconPath.Margin = new Thickness(_baseSearchIcon.Left + delta, _baseSearchIcon.Top, _baseSearchIcon.Right, _baseSearchIcon.Bottom);
-        if (SearchUnderline != null)
-            SearchUnderline.Margin = new Thickness(_baseUnderline.Left + delta, _baseUnderline.Top, _baseUnderline.Right, _baseUnderline.Bottom);
+        if (SearchBar != null)
+            SearchBar.Margin = new Thickness(_baseSearchBar.Left + delta, _baseSearchBar.Top, _baseSearchBar.Right, _baseSearchBar.Bottom);
     }
 
     private async Task AnimateGroupNames(bool visible, int steps = 10, int delayMs = 12)

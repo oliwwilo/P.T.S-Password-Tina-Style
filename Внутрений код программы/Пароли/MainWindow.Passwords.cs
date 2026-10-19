@@ -243,7 +243,7 @@ public partial class MainWindow
 
             var card = new Border
             {
-                Background = Brush.Parse("#FF1A1A2E"),
+                Background = Brush.Parse("#33000000"),
                 CornerRadius = new CornerRadius(14),
                 BorderThickness = new Thickness(0),
                 BoxShadow = new BoxShadows(new BoxShadow
@@ -266,6 +266,8 @@ public partial class MainWindow
 
             card.PointerPressed += (s, e) =>
             {
+                if (IsPressOnButton(e.Source, card)) return;
+
                 if (!_isSelectionMode)
                 {
                     _dragStartPoint = e.GetPosition(DragLayer);
@@ -277,6 +279,8 @@ public partial class MainWindow
 
             card.PointerMoved += (s, e) =>
             {
+                if (IsPressOnButton(e.Source, card)) return;
+
                 if (!_isSelectionMode && e.GetCurrentPoint(card).Properties.IsLeftButtonPressed)
                 {
                     var position = e.GetPosition(DragLayer);
@@ -299,6 +303,8 @@ public partial class MainWindow
 
             card.PointerReleased += (s, e) =>
             {
+                if (IsPressOnButton(e.Source, card)) return;
+
                 if (!_isSelectionMode)
                 {
                     if (_isDraggingPassword)
@@ -471,7 +477,17 @@ public partial class MainWindow
             Grid.SetColumn(info, 1);
             Grid.SetColumn(actions, 2);
 
-            card.Child = grid;
+            var glass = new ExperimentalAcrylicBorder
+            {
+                CornerRadius = new CornerRadius(14),
+                Child = grid
+            };
+
+            object? material = null;
+            Application.Current?.TryFindResource("PasswordCardGlass", null, out material);
+            glass.Material = material as ExperimentalAcrylicMaterial;
+
+            card.Child = glass;
             return card;
         }
         catch (Exception ex)
@@ -481,12 +497,23 @@ public partial class MainWindow
         }
     }
 
+    private static bool IsPressOnButton(object? source, Control card)
+    {
+        var node = source as Control;
+        while (node != null && node != card)
+        {
+            if (node is Button) return true;
+            node = node.Parent as Control;
+        }
+        return false;
+    }
+
     private void UpdateCardNumbers()
     {
         int number = 1;
         foreach (var child in PasswordsContainer.Children)
         {
-            if (child is Border { Child: Grid grid })
+            if (child is Border { Child: ExperimentalAcrylicBorder { Child: Grid grid } })
             {
                 foreach (var gridChild in grid.Children)
                 {

@@ -290,7 +290,7 @@ MinHeight="400"
                        FontWeight="ExtraBold"
                        Foreground="{DynamicResource AccentBrush}"
                        RelativePanel.AlignLeftWithPanel="True"
-                        Margin="120,180,0,0"
+                        Margin="100,180,0,0"
                         IsVisible="True" />
 
            
@@ -513,28 +513,28 @@ MinHeight="400"
                    </Transitions>
                </Setter>
            </Style>
-           <Style Selector="Button:pointerover">
-               <Setter Property="Background" Value="#1AEAB308" />
-               <Setter Property="Foreground" Value="#FDE047" />
-           </Style>
-           <Style Selector="Button:pressed">
-               <Setter Property="Background" Value="#33EAB308" />
-               <Setter Property="Foreground" Value="#FDE047" />
-           </Style>
-           <Style Selector="Button /template/ ContentPresenter">
-               <Setter Property="Background" Value="Transparent" />
-               <Setter Property="Transitions" Value="{x:Null}" />
-           </Style>
-           <Style Selector="Button:pointerover /template/ ContentPresenter">
-               <Setter Property="Background" Value="Transparent" />
-           </Style>
-           <Style Selector="Button:pressed /template/ ContentPresenter">
-               <Setter Property="Background" Value="Transparent" />
-           </Style>
-       </Button.Styles>
-       <StackPanel Orientation="Horizontal" Spacing="6" HorizontalAlignment="Center"
-                   VerticalAlignment="Center">
-            <TextBlock Text="&#xE838;"
+            <Style Selector="Button:pointerover">
+                <Setter Property="Background" Value="#1AEAB308" />
+                <Setter Property="Foreground" Value="#FDE047" />
+            </Style>
+            <Style Selector="Button:pressed">
+                <Setter Property="Background" Value="#33EAB308" />
+                <Setter Property="Foreground" Value="#FDE047" />
+            </Style>
+            <Style Selector="Button /template/ ContentPresenter">
+                <Setter Property="Background" Value="Transparent" />
+                <Setter Property="Transitions" Value="{x:Null}" />
+            </Style>
+            <Style Selector="Button:pointerover /template/ ContentPresenter">
+                <Setter Property="Background" Value="Transparent" />
+            </Style>
+            <Style Selector="Button:pressed /template/ ContentPresenter">
+                <Setter Property="Background" Value="Transparent" />
+            </Style>
+        </Button.Styles>
+        <StackPanel Orientation="Horizontal" Spacing="6" HorizontalAlignment="Center"
+                    VerticalAlignment="Center">
+             <TextBlock Text="&#xE838;"
                        FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
                        FontSize="14"
                        Foreground="{Binding $parent[Button].Foreground}"
@@ -548,86 +548,87 @@ MinHeight="400"
                        VerticalAlignment="Center" />
        </StackPanel>
    </Button>
-   <Button x:Name="ClearSearchButton"
-           Grid.Column="1"
-           Width="25"
-           Height="25"
-           Margin="5,0,10,0"
-           Background="Transparent"
-           CornerRadius="12"
-           Click="OnClearSearchClick"
-           IsVisible="False"
-             ToolTip.Placement="Top"
-             ToolTip.Tip="Очистить поиск">
-        <TextBlock Text="&#xE711;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Foreground="White" FontSize="12"/>
-    </Button>
- <TextBox x:Name="SearchBox"
-             Theme="{StaticResource NoHighlightTextBox}"
-             Height="30"
-            Margin="140,190,0,0"
+    <Border x:Name="SearchBar"
             RelativePanel.Below="Nadpis"
             RelativePanel.AlignLeftWithPanel="True"
             RelativePanel.AlignRightWithPanel="True"
             HorizontalAlignment="Stretch"
-            Background="Transparent"
-            Foreground="White"
-            BorderThickness="0"
-            CornerRadius="10"
-Padding="10,5"
-             SelectionForegroundBrush="Transparent"
-             CaretBrush="White"
-             GotFocus="OnSearchGotFocus"
-             LostFocus="OnSearchLostFocus"
-             TextChanged="OnSearchTextChanged"/>
-
- <Border x:Name="SearchPlaceholderOverlay"
-         IsHitTestVisible="False"
-         RelativePanel.Below="Nadpis"
-         RelativePanel.AlignLeftWithPanel="True"
-         RelativePanel.AlignRightWithPanel="True"
-         HorizontalAlignment="Stretch"
-         Height="30"
-         Margin="140,190,0,0"
-         Padding="10,5"
-         Opacity="1">
-     <Border.Transitions>
-         <Transitions>
-             <DoubleTransition Property="Opacity"
-                               Duration="0:0:0.18"
-                               Easing="CubicEaseOut" />
-         </Transitions>
-     </Border.Transitions>
-     <TextBlock Text=" Поиск"
-                Foreground="White"
-                VerticalAlignment="Center" />
- </Border>
-   
-   
-   
-<Border Grid.Column="0"
-            x:Name="SearchIconBorder"
-            RelativePanel.Below="Nadpis"
-            Width="30"
             Height="30"
-            CornerRadius="10,0,0,10"
+            Margin="140,190,30,0"
             Background="Transparent">
-       <Path x:Name="SearchIconPath"
-             Data="M14.5,14.5 L19,19 L18,19 L13.5,14.5 C12.5,15.5 11.2,16 10,16 C6.7,16 4,13.3 4,10 C4,6.7 6.7,4 10,4 C13.3,4 16,6.7 16,10 C16,11.2 15.5,12.5 14.5,14.5 Z M10,5 C7.2,5 5,7.2 5,10 C5,12.8 7.2,15 10,15 C12.8,15 15,12.8 15,10 C15,7.2 12.8,5 10,5 Z"
-             Fill="{DynamicResource TextBrush}"
-             Opacity="0.5"
-             Width="16"
-             Height="16"
-             Stretch="Uniform"
-             Margin="130,203,0,0"/>
-   </Border>
-   <Border x:Name="SearchUnderline"
-           Height="1"
-           Background="White"
-           HorizontalAlignment="Stretch"
-           Margin="150,1,30,0"
-           RelativePanel.Below="SearchBox"
-           RelativePanel.AlignLeftWithPanel="True"
-           RelativePanel.AlignRightWithPanel="True"/>
+        <Grid ColumnDefinitions="Auto,*,Auto">
+            <Border x:Name="SearchIconBorder"
+                    Grid.Column="0"
+                    Width="30"
+                    Height="30"
+                    CornerRadius="10,0,0,10"
+                    Background="Transparent">
+                <Path x:Name="SearchIconPath"
+                      Data="M14.5,14.5 L19,19 L18,19 L13.5,14.5 C12.5,15.5 11.2,16 10,16 C6.7,16 4,13.3 4,10 C4,6.7 6.7,4 10,4 C13.3,4 16,6.7 16,10 C16,11.2 15.5,12.5 14.5,14.5 Z M10,5 C7.2,5 5,7.2 5,10 C5,12.8 7.2,15 10,15 C12.8,15 15,12.8 15,10 C15,7.2 12.8,5 10,5 Z"
+                      Fill="{DynamicResource TextBrush}"
+                      Opacity="0.5"
+                      Width="16"
+                      Height="16"
+                      Stretch="Uniform"
+                      HorizontalAlignment="Center"
+                      VerticalAlignment="Center"/>
+            </Border>
+            <TextBox x:Name="SearchBox"
+                     Grid.Column="1"
+                     Theme="{StaticResource NoHighlightTextBox}"
+                     Height="30"
+                     Padding="10,5"
+                     HorizontalAlignment="Stretch"
+                     Background="Transparent"
+                     Foreground="White"
+                     BorderThickness="0"
+                     CornerRadius="10"
+                     SelectionForegroundBrush="Transparent"
+                     CaretBrush="White"
+                     GotFocus="OnSearchGotFocus"
+                     LostFocus="OnSearchLostFocus"
+                     TextChanged="OnSearchTextChanged"/>
+            <Border x:Name="SearchPlaceholderOverlay"
+                    Grid.Column="1"
+                    IsHitTestVisible="False"
+                    Background="Transparent"
+                    Padding="10,5"
+                    Opacity="1">
+                <Border.Transitions>
+                    <Transitions>
+                        <DoubleTransition Property="Opacity"
+                                          Duration="0:0:0.18"
+                                          Easing="CubicEaseOut" />
+                    </Transitions>
+                </Border.Transitions>
+                <TextBlock Text="Пароли"
+                           Foreground="White"
+                           VerticalAlignment="Center" />
+            </Border>
+            <Button x:Name="ClearSearchButton"
+                    Grid.Column="2"
+                    Width="25"
+                    Height="25"
+                    Margin="5,0,10,0"
+                    VerticalAlignment="Center"
+                    Background="Transparent"
+                    CornerRadius="12"
+                    Click="OnClearSearchClick"
+                    IsVisible="False"
+                    ToolTip.Placement="Top"
+                    ToolTip.Tip="Очистить поиск">
+                <TextBlock Text="&#xE711;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Foreground="White" FontSize="12"/>
+            </Button>
+        </Grid>
+    </Border>
+    <Border x:Name="SearchUnderline"
+            Height="1"
+            Background="White"
+            HorizontalAlignment="Stretch"
+            Margin="180,1,30,0"
+            RelativePanel.Below="SearchBar"
+            RelativePanel.AlignLeftWithPanel="True"
+            RelativePanel.AlignRightWithPanel="True"/>
             <!-- Выдвижная панель вынесена на верхний слой (см. ниже) -->
 
             <!-- ОТКЛЮЧЕНОООООООООООООООООООООООООООООООООООО -->
