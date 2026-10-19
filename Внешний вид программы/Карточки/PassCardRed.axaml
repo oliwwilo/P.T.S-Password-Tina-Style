@@ -2,6 +2,60 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="TinaPASS.Main.PassCardRed">
 
+    <UserControl.Styles>
+        <Style Selector="Button">
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Transitions">
+                <Transitions>
+                    <BrushTransition Property="Background" Duration="0:0:0.15" />
+                    <BrushTransition Property="Foreground" Duration="0:0:0.15" />
+                </Transitions>
+            </Setter>
+        </Style>
+        <Style Selector="Button /template/ ContentPresenter">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Transitions" Value="{x:Null}" />
+        </Style>
+        <Style Selector="Button:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="Transparent" />
+        </Style>
+        <Style Selector="Button:pressed /template/ ContentPresenter">
+            <Setter Property="Background" Value="Transparent" />
+        </Style>
+
+        <Style Selector="Button.icon">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
+        </Style>
+        <Style Selector="Button.icon:pointerover">
+            <Setter Property="Background" Value="#2669DBFE" />
+            <Setter Property="Foreground" Value="#A5F3FC" />
+        </Style>
+        <Style Selector="Button.icon:pressed">
+            <Setter Property="Background" Value="#4069DBFE" />
+        </Style>
+
+        <Style Selector="Button.primary">
+            <Setter Property="Background" Value="{DynamicResource PrimaryBrush}" />
+            <Setter Property="Foreground" Value="Black" />
+            <Setter Property="FontWeight" Value="Bold" />
+        </Style>
+        <Style Selector="Button.primary:pointerover">
+            <Setter Property="Background" Value="{DynamicResource PrimaryDarkBrush}" />
+        </Style>
+
+        <Style Selector="Button.ghost">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+        </Style>
+        <Style Selector="Button.ghost:pointerover">
+            <Setter Property="Background" Value="#1AFFFFFF" />
+            <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
+        </Style>
+    </UserControl.Styles>
+
     <Grid>
         <Border Background="#80000000"
                 HorizontalAlignment="Stretch"
@@ -14,26 +68,36 @@
                 CornerRadius="20"
                 Padding="25"
                 Width="400"
-                BorderBrush="{DynamicResource PrimaryBrush}"
-                BorderThickness="2"
+                BorderBrush="{DynamicResource BorderBrush}"
+                BorderThickness="1"
                 HorizontalAlignment="Center"
                 VerticalAlignment="Center">
 
             <StackPanel Spacing="15">
 
-                <TextBlock x:Name="TitleText"
-                           Text="Новый пароль"
-                           FontSize="20"
-                           FontFamily="Inter"
-                           FontWeight="ExtraBold"
-                           Foreground="{DynamicResource PrimaryBrush}"
-                           HorizontalAlignment="Center" />
+                <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Center">
+                    <TextBlock Text="&#xE72E;"
+                               FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                               FontSize="22"
+                               Foreground="{DynamicResource AccentBrush}"
+                               VerticalAlignment="Center" />
+                    <TextBlock x:Name="TitleText"
+                               Text="Новый пароль"
+                               FontSize="20"
+                               FontFamily="Inter"
+                               FontWeight="ExtraBold"
+                               Foreground="{DynamicResource TextBrush}"
+                               VerticalAlignment="Center" />
+                </StackPanel>
 
                 <!-- Название -->
                 <TextBlock Text="Название" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="14" FontWeight="SemiBold" />
                 <TextBox x:Name="TitleBox"
                          Watermark="Введите название"
                          Background="{DynamicResource SurfaceBrush}"
+                         Foreground="{DynamicResource TextBrush}"
+                         BorderBrush="{DynamicResource BorderBrush}"
+                         BorderThickness="1"
                          CornerRadius="10"
                          Padding="15" />
 
@@ -44,19 +108,21 @@
                              Grid.Column="0"
                              Watermark="example@mail.com"
                              Background="{DynamicResource SurfaceBrush}"
+                             Foreground="{DynamicResource TextBrush}"
+                             BorderBrush="{DynamicResource BorderBrush}"
+                             BorderThickness="1"
                              CornerRadius="10"
                              Padding="15" />
                     <Button x:Name="CopyEmailButton"
                             Grid.Column="1"
+                            Classes="icon"
                             Content="&#xE8C8;"
                             FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
                             Width="40"
                             Height="36"
                             Margin="8,0,0,0"
                             CornerRadius="8"
-                            Background="{DynamicResource SuccessBrush}"
                             FontSize="16"
-                            Cursor="Hand"
                             Click="OnCopyEmailClick"
                             ToolTip.Tip="Скопировать почту" />
                 </Grid>
@@ -68,19 +134,21 @@
                              Grid.Column="0"
                              Watermark="Введите логин"
                              Background="{DynamicResource SurfaceBrush}"
+                             Foreground="{DynamicResource TextBrush}"
+                             BorderBrush="{DynamicResource BorderBrush}"
+                             BorderThickness="1"
                              CornerRadius="10"
                              Padding="15" />
                     <Button x:Name="CopyLoginButton"
                             Grid.Column="1"
+                            Classes="icon"
                             Content="&#xE8C8;"
                             FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
                             Width="40"
                             Height="36"
                             Margin="8,0,0,0"
                             CornerRadius="8"
-                            Background="{DynamicResource SuccessBrush}"
                             FontSize="16"
-                            Cursor="Hand"
                             Click="OnCopyLoginClick"
                             ToolTip.Tip="Скопировать логин" />
                 </Grid>
@@ -92,32 +160,33 @@
                              Grid.Column="0"
                              Watermark="Пароль"
                              Background="{DynamicResource SurfaceBrush}"
-                             CornerRadius="8"
+                             Foreground="{DynamicResource TextBrush}"
+                             BorderBrush="{DynamicResource BorderBrush}"
+                             BorderThickness="1"
+                             CornerRadius="10"
                              Padding="12,10" />
                     <Button x:Name="GeneratePasswordButton"
                             Grid.Column="1"
+                            Classes="primary"
                             Content="&#xE72C;"
                             FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
                             Width="40"
                             Height="36"
                             Margin="8,0,0,0"
                             CornerRadius="8"
-                            Background="{DynamicResource PrimaryBrush}"
                             FontSize="16"
-                            Cursor="Hand"
                             Click="OnGeneratePasswordClick"
                             ToolTip.Tip="Сгенерировать пароль" />
                     <Button x:Name="CopyPasswordButton"
                             Grid.Column="2"
+                            Classes="icon"
                             Content="&#xE8C8;"
                             FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
                             Width="40"
                             Height="36"
                             Margin="8,0,0,0"
                             CornerRadius="8"
-                            Background="{DynamicResource SuccessBrush}"
                             FontSize="16"
-                            Cursor="Hand"
                             Click="OnCopyPasswordClick"
                             ToolTip.Tip="Скопировать пароль" />
                 </Grid>
@@ -127,6 +196,9 @@
                 <TextBox x:Name="DescriptionBox"
                          Watermark="Дополнительная информация"
                          Background="{DynamicResource SurfaceBrush}"
+                         Foreground="{DynamicResource TextBrush}"
+                         BorderBrush="{DynamicResource BorderBrush}"
+                         BorderThickness="1"
                          CornerRadius="10"
                          Padding="15"
                          AcceptsReturn="True"
@@ -136,19 +208,16 @@
                 <!-- Кнопки -->
                 <Grid ColumnDefinitions="*,*" ColumnSpacing="10" Margin="0,20,0,0">
                     <Button Grid.Column="0"
+                            Classes="ghost"
                             Content="Отмена"
                             Height="40"
                             CornerRadius="10"
-                            Background="{DynamicResource SurfaceBrush}"
-                            Foreground="{DynamicResource TextSecondaryBrush}"
                             Click="OnCancelClick" />
                     <Button Grid.Column="1"
+                            Classes="primary"
                             Content="Сохранить"
                             Height="40"
                             CornerRadius="10"
-                            Background="{DynamicResource PrimaryBrush}"
-                            Foreground="Black"
-                            FontWeight="Bold"
                             Click="OnSaveClick" />
                 </Grid>
 
