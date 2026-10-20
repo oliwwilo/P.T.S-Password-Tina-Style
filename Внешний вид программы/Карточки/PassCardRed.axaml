@@ -82,7 +82,7 @@
 
         <Border Background="Transparent" Tapped="OnOverlayTapped" Margin="0,33,0,0" />
 
-        <Border Background="{DynamicResource SurfaceLightBrush}"
+        <Border Background="#000000"
                 CornerRadius="20"
                 Padding="25"
                 Width="400"
