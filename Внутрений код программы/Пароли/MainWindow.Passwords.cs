@@ -332,7 +332,8 @@ public partial class MainWindow
             numberBadge.Child = new TextBlock
             {
                 Text = number.ToString(),
-                FontSize = 13,
+                FontFamily = new FontFamily("avares://TinaPASS/Assets/Fonts#Busorama"),
+                FontSize = 14,
                 FontWeight = FontWeight.Medium,
                 Foreground = Brush.Parse("#4ADE80"),
                 HorizontalAlignment = HorizontalAlignment.Center,

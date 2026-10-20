@@ -35,10 +35,7 @@
     <AvaloniaResource Include="Assets\LSPK0000.png" />
     <AvaloniaResource Include="Assets\Fonts\ZalandoSans-SemiExpanded.ttf" />
     <AvaloniaResource Include="Assets\Fonts\ZalandoSans-SemiExpandedBold.ttf" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Assets\Fonts\" />
+    <AvaloniaResource Include="Assets\Fonts\ofont.ru_Busorama.ttf" />
   </ItemGroup>
 
   <ItemGroup>
