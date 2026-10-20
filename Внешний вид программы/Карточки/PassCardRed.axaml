@@ -36,12 +36,16 @@
         </Style>
 
         <Style Selector="Button.primary">
-            <Setter Property="Background" Value="{DynamicResource PrimaryBrush}" />
-            <Setter Property="Foreground" Value="Black" />
+            <Setter Property="Background" Value="#2E7D5B" />
+            <Setter Property="Foreground" Value="#EAFFF4" />
             <Setter Property="FontWeight" Value="Bold" />
         </Style>
         <Style Selector="Button.primary:pointerover">
-            <Setter Property="Background" Value="{DynamicResource PrimaryDarkBrush}" />
+            <Setter Property="Background" Value="#3A9C72" />
+            <Setter Property="Foreground" Value="White" />
+        </Style>
+        <Style Selector="Button.primary:pressed">
+            <Setter Property="Background" Value="#256B4D" />
         </Style>
 
         <Style Selector="Button.ghost">
@@ -53,6 +57,20 @@
         <Style Selector="Button.ghost:pointerover">
             <Setter Property="Background" Value="#1AFFFFFF" />
             <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
+        </Style>
+
+        <Style Selector="Button.cancel">
+            <Setter Property="Background" Value="#2AEF4444" />
+            <Setter Property="Foreground" Value="#FECACA" />
+            <Setter Property="BorderBrush" Value="#55EF4444" />
+            <Setter Property="BorderThickness" Value="1" />
+        </Style>
+        <Style Selector="Button.cancel:pointerover">
+            <Setter Property="Background" Value="#40EF4444" />
+            <Setter Property="Foreground" Value="#FFF1F1" />
+        </Style>
+        <Style Selector="Button.cancel:pressed">
+            <Setter Property="Background" Value="#59EF4444" />
         </Style>
     </UserControl.Styles>
 
@@ -206,16 +224,18 @@
                          MaxHeight="80" />
 
                 <!-- Кнопки -->
-                <Grid ColumnDefinitions="*,*" ColumnSpacing="10" Margin="0,20,0,0">
+                <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10" Margin="0,20,0,0">
                     <Button Grid.Column="0"
-                            Classes="ghost"
+                            Classes="cancel"
                             Content="Отмена"
+                            MinWidth="110"
                             Height="40"
                             CornerRadius="10"
                             Click="OnCancelClick" />
-                    <Button Grid.Column="1"
+                    <Button Grid.Column="2"
                             Classes="primary"
                             Content="Сохранить"
+                            MinWidth="150"
                             Height="40"
                             CornerRadius="10"
                             Click="OnSaveClick" />
