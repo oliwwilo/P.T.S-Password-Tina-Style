@@ -82,14 +82,20 @@
 
         <Border Background="Transparent" Tapped="OnOverlayTapped" Margin="0,33,0,0" />
 
-        <Border Background="#000000"
-                CornerRadius="20"
+        <Border CornerRadius="20"
                 Padding="25"
                 Width="400"
                 BorderBrush="{DynamicResource BorderBrush}"
                 BorderThickness="1"
                 HorizontalAlignment="Center"
                 VerticalAlignment="Center">
+            <Border.Background>
+                <LinearGradientBrush StartPoint="0%,0%" EndPoint="0%,100%">
+                    <GradientStop Color="#1B0A2A" Offset="0" />
+                    <GradientStop Color="#0A0A12" Offset="0.45" />
+                    <GradientStop Color="#000000" Offset="1" />
+                </LinearGradientBrush>
+            </Border.Background>
 
             <StackPanel Spacing="15">
 
