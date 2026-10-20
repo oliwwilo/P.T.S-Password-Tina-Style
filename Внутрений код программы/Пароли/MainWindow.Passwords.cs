@@ -328,7 +328,7 @@ public partial class MainWindow
                 CornerRadius = new CornerRadius(8),
                 Width = 28,
                 Height = 28,
-                Margin = new Thickness(0, 0, 12, 0),
+                Margin = new Thickness(-6, 0, 12, 0),
                 VerticalAlignment = VerticalAlignment.Center
             };
             numberBadge.Child = new TextBlock
