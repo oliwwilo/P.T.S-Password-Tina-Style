@@ -336,6 +336,7 @@ public partial class MainWindow
                 Text = number.ToString(),
                 FontFamily = CardFont,
                 FontSize = 14,
+                Margin = new Thickness(2, 0, 0, 0),
                 FontWeight = FontWeight.Medium,
                 Foreground = Brush.Parse("#4ADE80"),
                 HorizontalAlignment = HorizontalAlignment.Center,
