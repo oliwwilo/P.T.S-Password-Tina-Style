@@ -17,6 +17,8 @@ namespace TinaPASS.Main;
 
 public partial class MainWindow
 {
+    private static readonly FontFamily CardFont = new FontFamily("avares://TinaPASS/Assets/Fonts#ZegerSYSTEM Alt");
+
     private void OpenRegistrationButton_Click(object? sender, RoutedEventArgs e)
     {
         editingPassword = null;
@@ -344,6 +346,7 @@ public partial class MainWindow
             info.Children.Add(new TextBlock
             {
                 Text = title,
+                FontFamily = CardFont,
                 FontSize = 16,
                 FontWeight = FontWeight.Bold,
                 Foreground = Brushes.White,
@@ -353,6 +356,7 @@ public partial class MainWindow
             if (!string.IsNullOrWhiteSpace(login))
             {
                 var loginText = FluentIcons.Build($"{FluentIcons.Contact} Логин: {login}", 12, Brushes.White);
+                loginText.FontFamily = CardFont;
                 loginText.Margin = new Thickness(0, 3, 0, 0);
                 loginText.Tag = "login";
                 info.Children.Add(loginText);
@@ -361,6 +365,7 @@ public partial class MainWindow
             if (!string.IsNullOrWhiteSpace(email))
             {
                 var emailText = FluentIcons.Build($"{FluentIcons.Mail} Почта: {new string('●', email.Length)}", 12, Brushes.White);
+                emailText.FontFamily = CardFont;
                 emailText.Margin = new Thickness(0, 3, 0, 0);
                 emailText.Tag = "email";
                 info.Children.Add(emailText);
@@ -369,6 +374,7 @@ public partial class MainWindow
             if (!string.IsNullOrWhiteSpace(description))
             {
                 var descText = FluentIcons.Build($"{FluentIcons.Document} {description}", 12, Brushes.White);
+                descText.FontFamily = CardFont;
                 descText.Margin = new Thickness(0, 3, 0, 0);
                 descText.TextWrapping = TextWrapping.Wrap;
                 descText.Tag = "desc";
@@ -380,6 +386,7 @@ public partial class MainWindow
                     ? $"{FluentIcons.Lock} Пароль не указан"
                     : $"{FluentIcons.Lock} Пароль: {new string('●', rawPassword.Length)}",
                 12, Brushes.White);
+            passwordText.FontFamily = CardFont;
             passwordText.Margin = new Thickness(0, 3, 0, 0);
             passwordText.Tag = password;
             info.Children.Add(passwordText);

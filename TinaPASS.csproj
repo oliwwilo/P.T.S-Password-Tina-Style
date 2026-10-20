@@ -36,6 +36,7 @@
     <AvaloniaResource Include="Assets\Fonts\ZalandoSans-SemiExpanded.ttf" />
     <AvaloniaResource Include="Assets\Fonts\ZalandoSans-SemiExpandedBold.ttf" />
     <AvaloniaResource Include="Assets\Fonts\ofont.ru_Busorama.ttf" />
+    <AvaloniaResource Include="Assets\Fonts\ZegerSYSTEMAlt-Regular.otf" />
   </ItemGroup>
 
   <ItemGroup>
