@@ -290,7 +290,7 @@ MinHeight="400"
                        FontWeight="ExtraBold"
                        Foreground="{DynamicResource AccentBrush}"
                        RelativePanel.AlignLeftWithPanel="True"
-                        Margin="100,180,0,0"
+                        Margin="120,180,0,0"
                         IsVisible="True" />
 
            
@@ -563,10 +563,8 @@ MinHeight="400"
             RelativePanel.AlignRightWithPanel="True"
             HorizontalAlignment="Stretch"
             Height="30"
-            Margin="110,180,30,0"
-            Background="Transparent"
-            BorderBrush="White"
-            BorderThickness="0,0,0,1">
+            Margin="100,190,30,0"
+            Background="Transparent">
         <Grid ColumnDefinitions="Auto,*,Auto">
             <Border x:Name="SearchIconBorder"
                     Grid.Column="0"
@@ -630,6 +628,14 @@ MinHeight="400"
                     ToolTip.Tip="Очистить поиск">
                 <TextBlock Text="&#xE711;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Foreground="White" FontSize="12"/>
             </Button>
+            <Border x:Name="SearchUnderline"
+                    Grid.Column="0"
+                    Grid.ColumnSpan="3"
+                    Height="1.5"
+                    Margin="28,35,0,0"
+                    VerticalAlignment="Bottom"
+                    Background="White"
+                    Opacity="0.7"/>
         </Grid>
     </Border>
             <!-- Выдвижная панель вынесена на верхний слой (см. ниже) -->
