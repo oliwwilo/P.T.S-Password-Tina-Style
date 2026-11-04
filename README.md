@@ -4,20 +4,18 @@
 
 ## Скачать
 
-В [Релизах](../../releases) — **по одному файлу** на систему. Скачиваете, запускаете, ничего распаковывать не нужно.
+В [Релизах](../../releases) — **по одному архиву** на систему. Распакуйте архив и запустите файл: устанавливать .NET не требуется, всё вшито в исполняемый файл (~100 МБ).
 
-| Файл | Система |
-| --- | --- |
-| `TinaPASS-win-x64.exe` | Windows 10/11 (64-bit) |
-| `TinaPASS-linux-x64` | Linux (64-bit) |
-| `TinaPASS-osx-x64` | macOS Intel |
-| `TinaPASS-osx-arm64` | macOS Apple Silicon (M1/M2/M3) |
-
-Устанавливать .NET не требуется — всё вшито в файл (~100 МБ).
+| Архив | Что внутри | Система |
+| --- | --- | --- |
+| `TinaPASS-win-x64.7z` | `TinaPASS-win-x64.exe` | Windows 10/11 (64-bit) |
+| `TinaPASS-linux-x64.7z` | `TinaPASS-linux-x64` | Linux (64-bit) |
+| `TinaPASS-osx-x64.7z` | `TinaPASS-osx-x64` | macOS Intel |
+| `TinaPASS-osx-arm64.7z` | `TinaPASS-osx-arm64` | macOS Apple Silicon (M1/M2/M3) |
 
 ### Windows
 
-Двойной клик по `TinaPASS-win-x64.exe` — и запускается.
+Распакуйте архив и запустите `TinaPASS-win-x64.exe` двойным кликом.
 
 Если Windows Defender/SmartScreen ругается (файл без подписи), нажмите **«Подробнее» → «Всё равно запустить»**.
 
@@ -63,7 +61,7 @@ dotnet publish TinaPASS.csproj -c Release -r win-x64 --self-contained true `
 
 ## Данные
 
-Пароли хранятся в локальной базе `tinapass.db` рядом с приложением. База шифруется, но при общей учётной записи Windows доступ к файлу возможен у всех, кто пользуется этим компьютером. Не копируйте `tinapass.db` в ненадёжные места.
+Пароли хранятся в локальной базе `tinapass.db` в папке `%LOCALAPPDATA%\TinaPASS\` (Windows), `~/.local/share/TinaPASS/` (Linux) или `~/Library/Application Support/TinaPASS/` (macOS). База шифруется, но при общей учётной записи Windows доступ к файлу возможен у всех, кто пользуется этим компьютером. Не копируйте `tinapass.db` в ненадёжные места.
 
 ## Ограничения
 
