@@ -16,6 +16,49 @@ namespace TinaPASS.Main;
 public partial class MainWindow
 {
     private string _searchText = "";
+    private bool _isResettingSearch;
+
+    /// <summary>
+    /// Полный список паролей текущей группы — без учёта фильтра поиска.
+    /// Важно: currentPasswords может быть отфильтрован поиском,
+    /// поэтому сохранять его в allPasswords нельзя — иначе пароли теряются.
+    /// </summary>
+    private List<PasswordEntry> GetFullCurrentGroupList()
+    {
+        if (!allPasswords.TryGetValue(currentGroup, out var full) || full == null)
+        {
+            full = new List<PasswordEntry>();
+            allPasswords[currentGroup] = full;
+        }
+        return full;
+    }
+
+    /// <summary>
+    /// Полностью очищает поле поиска и снимает фильтр.
+    /// </summary>
+    private void ResetSearch()
+    {
+        _searchText = "";
+
+        // Не перерисовываем список из TextChanged: вызывающий код сам обновит его
+        // (и сможет сделать это с анимацией, без двойной перестройки).
+        _isResettingSearch = true;
+        try
+        {
+            if (SearchBox != null && SearchBox.Text != "")
+                SearchBox.Text = "";
+        }
+        finally
+        {
+            _isResettingSearch = false;
+        }
+
+        if (ClearSearchButton != null)
+            ClearSearchButton.IsVisible = false;
+
+        UpdateSearchPlaceholder();
+    }
+
     private void UpdateSearchPlaceholder()
     {
         if (SearchPlaceholderOverlay == null) return;
@@ -74,7 +117,7 @@ public partial class MainWindow
         }
         return false;
     }
-    private void ApplySearchFilter()
+    private void ApplySearchFilter(bool animateList = false)
     {
         if (PasswordsContainer == null) return;
 
@@ -85,7 +128,7 @@ public partial class MainWindow
         if (string.IsNullOrWhiteSpace(_searchText))
         {
             currentPasswords = new List<PasswordEntry>(all);
-            UpdatePasswordsList();
+            UpdatePasswordsList(animateList);
             return;
         }
 
@@ -101,10 +144,12 @@ public partial class MainWindow
         }
 
         currentPasswords = filtered;
-        UpdatePasswordsList();
+        UpdatePasswordsList(animateList);
     }
     private void OnSearchTextChanged(object? sender, TextChangedEventArgs e)
     {
+        if (_isResettingSearch) return;
+
         if (sender is TextBox textBox)
         {
             _searchText = textBox.Text?.Trim() ?? "";

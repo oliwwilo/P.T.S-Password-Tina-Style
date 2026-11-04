@@ -12,8 +12,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Animation;
 using Avalonia.Animation.Easings;
+using Avalonia.Controls.Primitives;
 using Avalonia.Layout;
 using Avalonia.Media;
+using Avalonia.Media.Transformation;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 
@@ -88,6 +90,31 @@ public partial class MainWindow : Window
         };
 
         DrawerBackdrop.Opacity = 0;
+
+        // Плавная смена фона при переключении темы.
+        Transitions = new Transitions
+        {
+            new BrushTransition
+            {
+                Property = TemplatedControl.BackgroundProperty,
+                Duration = TimeSpan.FromMilliseconds(280),
+                Easing = new CubicEaseOut()
+            }
+        };
+
+        // Стрелка меню едет на render-потоке, без ручных шагов.
+        if (MenuLine != null)
+        {
+            MenuLine.Transitions = new Transitions
+            {
+                new TransformOperationsTransition
+                {
+                    Property = Visual.RenderTransformProperty,
+                    Duration = TimeSpan.FromMilliseconds(160),
+                    Easing = new CubicEaseOut()
+                }
+            };
+        }
     }
 
     private async Task OpenDrawer()
@@ -137,21 +164,13 @@ public partial class MainWindow : Window
         _ = CloseDrawer();
     }
 
-    private async void OnArrowPointerEnter(object? sender, PointerEventArgs e)
+    private void OnArrowPointerEnter(object? sender, PointerEventArgs e)
     {
-        for (int i = 0; i <= 10; i++)
-        {
-            MenuLine.Margin = new Thickness(0, i / 2.0, 0, 0);
-            await Task.Delay(15);
-        }
+        MenuLine.RenderTransform = TransformOperations.Parse("translateY(4px)");
     }
 
-    private async void OnArrowPointerLeave(object? sender, PointerEventArgs e)
+    private void OnArrowPointerLeave(object? sender, PointerEventArgs e)
     {
-        for (int i = 10; i >= 0; i--)
-        {
-            MenuLine.Margin = new Thickness(0, i / 2.0, 0, 0);
-            await Task.Delay(15);
-        }
+        MenuLine.RenderTransform = TransformOperations.Parse("translateY(0px)");
     }
 }

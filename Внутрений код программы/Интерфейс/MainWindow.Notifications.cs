@@ -1,9 +1,13 @@
 using Avalonia;
+using Avalonia.Animation;
+using Avalonia.Animation.Easings;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Media;
+using Avalonia.Media.Transformation;
 using Avalonia.Threading;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace TinaPASS.Main;
@@ -14,22 +18,83 @@ public partial class MainWindow
     private Border? _currentDialog;
     private Border? _loadingOverlay;
     private TextBlock? _loadingText;
+    private bool _isClosingCanvas;
+    private int _loadingVisibilityVersion;
 
     // ============ ДИАЛОГ ПОДТВЕРЖДЕНИЯ ============
     private void ShowConfirmation(string message, Action onConfirm)
     {
+        // Если предыдущий диалог ещё открыт/закрывается — убираем его мгновенно,
+        // чтобы не наслаивать затемнения.
+        if (_currentCanvas != null)
+        {
+            this.SizeChanged -= OnWindowSizeChangedForCanvas;
+            (this.Content as Panel)?.Children.Remove(_currentCanvas);
+            _currentCanvas = null;
+            _currentDialog = null;
+            _isClosingCanvas = false;
+        }
+
         _currentCanvas = new Canvas
         {
             Background = Brush.Parse("#80000000"),
             Width = this.Bounds.Width,
-            Height = this.Bounds.Height
+            Height = this.Bounds.Height,
+            Opacity = 0
         };
 
         _currentDialog = CreateConfirmationDialog(message, onConfirm);
+        _currentDialog.Opacity = 0;
+        _currentDialog.RenderTransformOrigin = new RelativePoint(0.5, 0.5, RelativeUnit.Relative);
+        _currentDialog.RenderTransform = TransformOperations.Parse("scale(0.92) translate(0px, 12px)");
+
         CenterDialogOnCanvas();
         _currentCanvas.Children.Add(_currentDialog);
         this.SizeChanged += OnWindowSizeChangedForCanvas;
         (this.Content as Panel)?.Children.Add(_currentCanvas);
+
+        AnimateCanvasIn();
+    }
+
+    private async void AnimateCanvasIn()
+    {
+        var canvas = _currentCanvas;
+        var dialog = _currentDialog;
+        if (canvas == null || dialog == null) return;
+
+        var duration = TimeSpan.FromMilliseconds(200);
+
+        await Task.Yield();
+        if (!ReferenceEquals(canvas, _currentCanvas)) return;
+
+        canvas.Transitions = new Transitions
+        {
+            new DoubleTransition
+            {
+                Property = Visual.OpacityProperty,
+                Duration = duration,
+                Easing = new CubicEaseOut()
+            }
+        };
+        dialog.Transitions = new Transitions
+        {
+            new DoubleTransition
+            {
+                Property = Visual.OpacityProperty,
+                Duration = duration,
+                Easing = new CubicEaseOut()
+            },
+            new TransformOperationsTransition
+            {
+                Property = Visual.RenderTransformProperty,
+                Duration = duration,
+                Easing = new CubicEaseOut()
+            }
+        };
+
+        canvas.Opacity = 1;
+        dialog.Opacity = 1;
+        dialog.RenderTransform = TransformOperations.Parse("scale(1) translate(0px, 0px)");
     }
     private Border CreateConfirmationDialog(string message, Action onConfirm)
     {
@@ -111,22 +176,24 @@ public partial class MainWindow
         content.Children.Add(buttonsPanel);
         dialog.Child = content;
 
-        cancelBtn.Click += (s, e) => CloseCanvas();
-        confirmBtn.Click += (s, e) =>
+        cancelBtn.Click += async (s, e) => await CloseCanvas();
+        confirmBtn.Click += async (s, e) =>
         {
-            CloseCanvas();
+            await CloseCanvas();
             onConfirm();
-            ShowSuccessFlash($"{FluentIcons.CheckMark} Удаление выполнено!");
         };
 
         return dialog;
     }
 
-   public void ShowLoading(string message)
+    public void ShowLoading(string message)
     {
         Dispatcher.UIThread.Invoke(() =>
         {
-            if (_loadingOverlay == null)
+            _loadingVisibilityVersion++;
+            bool isNew = _loadingOverlay == null;
+
+            if (isNew)
             {
                 _loadingOverlay = new Border
                 {
@@ -134,7 +201,8 @@ public partial class MainWindow
                     CornerRadius = new CornerRadius(10),
                     HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center,
                     VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center,
-                    Padding = new Thickness(30, 20, 30, 20)
+                    Padding = new Thickness(30, 20, 30, 20),
+                    Opacity = 0
                 };
 
                 var stackPanel = new StackPanel { Spacing = 15 };
@@ -158,87 +226,196 @@ public partial class MainWindow
                 stackPanel.Children.Add(_loadingText);
                 _loadingOverlay.Child = stackPanel;
             }
-            else
+            else if (_loadingText != null)
             {
                 _loadingText.Text = message;
-                _loadingOverlay.IsVisible = true;
             }
 
+            var overlay = _loadingOverlay;
+            if (overlay == null) return;
+
             var parent = this.Content as Panel;
-            if (parent != null && !parent.Children.Contains(_loadingOverlay))
-                parent.Children.Add(_loadingOverlay);
-            _loadingOverlay.IsVisible = true;
+            if (parent != null && !parent.Children.Contains(overlay))
+                parent.Children.Add(overlay);
+
+            bool wasVisible = overlay.IsVisible && overlay.Opacity > 0.5;
+            overlay.IsVisible = true;
+
+            if (isNew || !wasVisible)
+            {
+                overlay.Transitions = new Transitions
+                {
+                    new DoubleTransition
+                    {
+                        Property = Visual.OpacityProperty,
+                        Duration = TimeSpan.FromMilliseconds(180),
+                        Easing = new CubicEaseOut()
+                    }
+                };
+            }
+
+            overlay.Opacity = 1;
         });
     }
 
     public void HideLoading()
     {
-        Dispatcher.UIThread.Invoke(() =>
+        Dispatcher.UIThread.Post(async () =>
         {
-            if (_loadingOverlay != null)
-                _loadingOverlay.IsVisible = false;
+            var overlay = _loadingOverlay;
+            if (overlay == null || !overlay.IsVisible) return;
+
+            // Если за время анимации загрузку показали снова — не скрываем её.
+            int version = _loadingVisibilityVersion;
+
+            overlay.Transitions = new Transitions
+            {
+                new DoubleTransition
+                {
+                    Property = Visual.OpacityProperty,
+                    Duration = TimeSpan.FromMilliseconds(150),
+                    Easing = new CubicEaseIn()
+                }
+            };
+            overlay.Opacity = 0;
+
+            await Task.Delay(150);
+
+            if (version != _loadingVisibilityVersion) return;
+            if (!ReferenceEquals(_loadingOverlay, overlay)) return;
+
+            overlay.IsVisible = false;
+            overlay.Opacity = 1;
+            overlay.Transitions = null;
         });
     }
 
     // ============ ВСПЫШКИ ============
+    // Все уведомления живут в одном стеке в правом верхнем углу,
+    // поэтому появляются с одной стороны и не перекрывают друг друга.
+    private const int MaxVisibleNotifications = 3;
+    private StackPanel? _notificationHost;
+    private readonly List<Border> _activeNotifications = new();
+
     public async void ShowSuccessFlash(string message)
     {
-        await ShowRightFlash(message, "#4CAF50", 80);
+        await ShowNotification(message, "#4CAF50", TimeSpan.FromMilliseconds(2500));
     }
 
     public async void ShowError(string message)
     {
-        await ShowRightFlash(message, "#FF4444", -1);
+        await ShowNotification(message, "#FF4444", TimeSpan.FromMilliseconds(3200));
     }
 
-    private async Task ShowRightFlash(string message, string color, int topOffset = 80)
+    public async void ShowWarning(string message)
+    {
+        await ShowNotification(message, "#E6A700", TimeSpan.FromMilliseconds(2600));
+    }
+
+    private StackPanel? EnsureNotificationHost()
+    {
+        var parent = this.Content as Panel;
+        if (parent == null) return null;
+
+        if (_notificationHost == null || !parent.Children.Contains(_notificationHost))
+        {
+            _activeNotifications.Clear();
+            _notificationHost = new StackPanel
+            {
+                Spacing = 8,
+                HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Right,
+                VerticalAlignment = Avalonia.Layout.VerticalAlignment.Top,
+                Margin = new Thickness(0, 80, 20, 0),
+                MaxWidth = 400,
+                ZIndex = 999,
+                IsHitTestVisible = false
+            };
+            parent.Children.Add(_notificationHost);
+        }
+
+        return _notificationHost;
+    }
+
+    private async Task ShowNotification(string message, string color, TimeSpan visibleFor)
     {
         try
         {
-            // Создаём всплывающий элемент
-            var flash = new Border
+            var host = EnsureNotificationHost();
+            if (host == null) return;
+
+            var notification = new Border
             {
                 Background = Brush.Parse(color),
                 CornerRadius = new CornerRadius(10),
                 Padding = new Thickness(20, 10, 20, 10),
                 Opacity = 0,
+                RenderTransform = TransformOperations.Parse("translateX(26px)"),
                 HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Right,
-                VerticalAlignment = Avalonia.Layout.VerticalAlignment.Top,
-                Margin = new Thickness(0, topOffset, 20, 0),
-                MaxWidth = 400,
-                ZIndex = 999
+                MaxWidth = 400
             };
 
-            var textBlock = FluentIcons.Build(message, 14, Brushes.White, TextWrapping.Wrap);
+            notification.Child = FluentIcons.Build(message, 14, Brushes.White, TextWrapping.Wrap);
+            host.Children.Add(notification);
+            _activeNotifications.Add(notification);
 
-            flash.Child = textBlock;
-
-            // Находим родительский контейнер (Panel)
-            var parent = this.Content as Panel;
-            if (parent == null) return;
-
-            // Добавляем всплывашку на экран
-            parent.Children.Add(flash);
-
-            // Анимация появления
-            for (int i = 0; i <= 10; i++)
+            // Не даём уведомлениям копиться: самое старое убираем сразу.
+            while (_activeNotifications.Count > MaxVisibleNotifications)
             {
-                flash.Opacity = i * 0.1;
-                await Task.Delay(10);
+                var oldest = _activeNotifications[0];
+                _activeNotifications.RemoveAt(0);
+                host.Children.Remove(oldest);
             }
 
-            // Задержка (показываем сообщение)
-            await Task.Delay(2500);
+            // Появление: плавный выезд справа + fade.
+            var enter = TimeSpan.FromMilliseconds(220);
+            await Task.Yield();
+            if (!host.Children.Contains(notification)) return;
 
-            // Анимация исчезновения
-            for (int i = 10; i >= 0; i--)
+            notification.Transitions = new Transitions
             {
-                flash.Opacity = i * 0.1;
-                await Task.Delay(10);
-            }
+                new DoubleTransition
+                {
+                    Property = Visual.OpacityProperty,
+                    Duration = enter,
+                    Easing = new CubicEaseOut()
+                },
+                new TransformOperationsTransition
+                {
+                    Property = Visual.RenderTransformProperty,
+                    Duration = enter,
+                    Easing = new CubicEaseOut()
+                }
+            };
+            notification.Opacity = 1;
+            notification.RenderTransform = TransformOperations.Parse("translateX(0px)");
 
-            // Удаляем элемент
-            parent.Children.Remove(flash);
+            await Task.Delay(visibleFor);
+            if (!host.Children.Contains(notification)) return;
+
+            // Исчезновение: мягкий уход вправо + fade.
+            var exit = TimeSpan.FromMilliseconds(180);
+            notification.Transitions = new Transitions
+            {
+                new DoubleTransition
+                {
+                    Property = Visual.OpacityProperty,
+                    Duration = exit,
+                    Easing = new CubicEaseIn()
+                },
+                new TransformOperationsTransition
+                {
+                    Property = Visual.RenderTransformProperty,
+                    Duration = exit,
+                    Easing = new CubicEaseIn()
+                }
+            };
+            notification.Opacity = 0;
+            notification.RenderTransform = TransformOperations.Parse("translateX(16px)");
+
+            await Task.Delay(exit);
+
+            host.Children.Remove(notification);
+            _activeNotifications.Remove(notification);
         }
         catch (Exception ex)
         {
@@ -265,14 +442,58 @@ public partial class MainWindow
         }
     }
 
-    private void CloseCanvas()
+    private async Task CloseCanvas()
     {
-        if (_currentCanvas != null)
+        if (_currentCanvas == null || _isClosingCanvas) return;
+
+        _isClosingCanvas = true;
+        var canvas = _currentCanvas;
+        var dialog = _currentDialog;
+        this.SizeChanged -= OnWindowSizeChangedForCanvas;
+
+        var duration = TimeSpan.FromMilliseconds(160);
+
+        canvas.Transitions = new Transitions
         {
-            this.SizeChanged -= OnWindowSizeChangedForCanvas;
-            (this.Content as Panel)?.Children.Remove(_currentCanvas);
+            new DoubleTransition
+            {
+                Property = Visual.OpacityProperty,
+                Duration = duration,
+                Easing = new CubicEaseIn()
+            }
+        };
+
+        if (dialog != null)
+        {
+            dialog.Transitions = new Transitions
+            {
+                new DoubleTransition
+                {
+                    Property = Visual.OpacityProperty,
+                    Duration = duration,
+                    Easing = new CubicEaseIn()
+                },
+                new TransformOperationsTransition
+                {
+                    Property = Visual.RenderTransformProperty,
+                    Duration = duration,
+                    Easing = new CubicEaseIn()
+                }
+            };
+            dialog.Opacity = 0;
+            dialog.RenderTransform = TransformOperations.Parse("scale(0.95) translate(0px, 8px)");
+        }
+
+        canvas.Opacity = 0;
+        await Task.Delay(duration);
+
+        (this.Content as Panel)?.Children.Remove(canvas);
+
+        if (ReferenceEquals(_currentCanvas, canvas))
+        {
             _currentCanvas = null;
             _currentDialog = null;
         }
+        _isClosingCanvas = false;
     }
 }

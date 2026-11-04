@@ -66,12 +66,6 @@ public partial class MainWindow
         // (и отменяем фоновую загрузку GIF, чтобы картинка не «всплыла» после скрытия)
         HideGroupIcon();
 
-        if (!string.IsNullOrEmpty(currentGroup) && currentGroup != "Без группы")
-        {
-            if (allPasswords.ContainsKey(currentGroup))
-                allPasswords[currentGroup] = new List<PasswordEntry>(currentPasswords);
-        }
-
         if (!allPasswords.ContainsKey("Без группы"))
         {
             var docs = _dbService.GetNoGroupPasswords();
@@ -108,13 +102,9 @@ public partial class MainWindow
         UpdateUIControls("Без группы", isDeleteVisible: false, isIconVisible: false);
         if (NoGroupSwitch != null)
             NoGroupSwitch.IsChecked = true;
-// Сбрасываем поиск
-        _searchText = "";
-        if (SearchBox != null)
-            SearchBox.Text = "";
-        if (ClearSearchButton != null)
-            ClearSearchButton.IsVisible = false;
-        UpdatePasswordsList();
+        // При смене группы очищаем поиск и показываем все пароли группы.
+        ResetSearch();
+        ApplySearchFilter(animateList: true);
         UpdateImportButtonsVisibility();
         HighlightAllGroups();
         ClearSelection();
@@ -139,17 +129,8 @@ public partial class MainWindow
             return;
         }
 
-        if (!string.IsNullOrEmpty(currentGroup) && currentGroup != "Без группы")
-        {
-            if (allPasswords.ContainsKey(currentGroup))
-                allPasswords[currentGroup] = new List<PasswordEntry>(currentPasswords);
-        }
-// Сбрасываем поиск
-        _searchText = "";
-        if (SearchBox != null)
-            SearchBox.Text = "";
-        if (ClearSearchButton != null)
-            ClearSearchButton.IsVisible = false;
+        // currentPasswords может быть отфильтрован поиском — не сохраняем его в allPasswords,
+        // иначе остальные пароли группы безвозвратно пропадут.
         if (!allPasswords.ContainsKey(groupName))
         {
             var docs = _dbService.GetPasswordsByGroup(groupName);
@@ -194,7 +175,9 @@ public partial class MainWindow
             NoGroupSwitch.IsChecked = false;
 
         LoadGroupIcon(groupName);
-        UpdatePasswordsList();
+        // При смене группы очищаем поиск и показываем все пароли группы.
+        ResetSearch();
+        ApplySearchFilter(animateList: true);
         UpdateImportButtonsVisibility();
         HighlightAllGroups();
         ClearSelection();
@@ -226,8 +209,9 @@ public partial class MainWindow
                         }
                         else
                         {
+                            greenBar.Transitions = null;
                             greenBar.Background = isActive ? HighlightGradientBrush : Brushes.Transparent;
-                            greenBar.Opacity = isActive ? 1 : 1;
+                            greenBar.Opacity = 1;
                             greenBar.BoxShadow = new BoxShadows();
                         }
                     }

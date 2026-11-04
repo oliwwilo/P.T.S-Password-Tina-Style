@@ -1,7 +1,10 @@
 ﻿using Avalonia;
+using Avalonia.Animation;
+using Avalonia.Animation.Easings;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform.Storage;
@@ -178,18 +181,88 @@ public partial class MainWindow
 
     private async Task AnimateGroupsListWidth(double from, double to, int steps = 18, int delayMs = 8)
     {
-        for (int i = 1; i <= steps; i++)
+        var duration = TimeSpan.FromMilliseconds(
+            Math.Clamp(steps * Math.Max(delayMs, 1), 120, 320));
+        var ease = new CubicEaseOut();
+
+        // Стартовое состояние — без анимации.
+        GroupsScrollViewer.Transitions = null;
+        GroupsScrollViewer.Width = from;
+
+        await Task.Yield();
+
+        GroupsScrollViewer.Transitions = new Transitions
         {
-            double t = (double)i / steps;
-            double eased = 1 - Math.Pow(1 - t, 3);
-            double w = from + (to - from) * eased;
-            GroupsScrollViewer.Width = w;
-            ApplyGroupCardsWidth(w);
-            ApplyPasswordAreaShift(w - _groupsNormalWidth);
-            await Task.Delay(delayMs);
+            new DoubleTransition
+            {
+                Property = Layoutable.WidthProperty,
+                Duration = duration,
+                Easing = ease
+            }
+        };
+
+        foreach (var child in GroupsPanel.Children)
+        {
+            if (child is Border b)
+            {
+                b.Transitions = new Transitions
+                {
+                    new DoubleTransition
+                    {
+                        Property = Layoutable.WidthProperty,
+                        Duration = duration,
+                        Easing = ease
+                    }
+                };
+            }
         }
+
+        if (smenaslo != null)
+        {
+            smenaslo.Transitions = new Transitions
+            {
+                new ThicknessTransition
+                {
+                    Property = Layoutable.MarginProperty,
+                    Duration = duration,
+                    Easing = ease
+                }
+            };
+        }
+
+        if (SearchBar != null)
+        {
+            SearchBar.Transitions = new Transitions
+            {
+                new ThicknessTransition
+                {
+                    Property = Layoutable.MarginProperty,
+                    Duration = duration,
+                    Easing = ease
+                }
+            };
+        }
+
         GroupsScrollViewer.Width = to;
         ApplyGroupCardsWidth(to);
+        ApplyPasswordAreaShift(to - _groupsNormalWidth);
+
+        await Task.Delay(duration);
+
+        GroupsScrollViewer.Transitions = null;
+        GroupsScrollViewer.Width = to;
+
+        foreach (var child in GroupsPanel.Children)
+        {
+            if (child is Border b)
+            {
+                b.Transitions = null;
+                b.Width = to;
+            }
+        }
+
+        if (smenaslo != null) smenaslo.Transitions = null;
+        if (SearchBar != null) SearchBar.Transitions = null;
         ApplyPasswordAreaShift(to - _groupsNormalWidth);
     }
 
@@ -215,28 +288,40 @@ public partial class MainWindow
     private async Task AnimateGroupNames(bool visible, int steps = 10, int delayMs = 12)
     {
         var texts = _groupNameTexts.Values.ToList();
+        var duration = TimeSpan.FromMilliseconds(
+            Math.Clamp(steps * Math.Max(delayMs, 1), 100, 300));
+
         foreach (var t in texts)
         {
             if (t == null) continue;
+            t.Transitions = null;
             t.IsVisible = true;
             t.Opacity = visible ? 0 : 1;
         }
 
-        for (int i = 1; i <= steps; i++)
-        {
-            double progress = (double)i / steps;
-            double eased = 1 - Math.Pow(1 - progress, 3);
-            foreach (var t in texts)
-            {
-                if (t == null) continue;
-                t.Opacity = visible ? eased : 1 - eased;
-            }
-            await Task.Delay(delayMs);
-        }
+        await Task.Yield();
 
         foreach (var t in texts)
         {
             if (t == null) continue;
+            t.Transitions = new Transitions
+            {
+                new DoubleTransition
+                {
+                    Property = Visual.OpacityProperty,
+                    Duration = duration,
+                    Easing = new CubicEaseOut()
+                }
+            };
+            t.Opacity = visible ? 1 : 0;
+        }
+
+        await Task.Delay(duration);
+
+        foreach (var t in texts)
+        {
+            if (t == null) continue;
+            t.Transitions = null;
             t.Opacity = visible ? 1 : 0;
             if (!visible) t.IsVisible = false;
         }

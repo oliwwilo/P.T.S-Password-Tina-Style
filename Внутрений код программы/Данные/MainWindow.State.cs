@@ -48,10 +48,12 @@ public partial class MainWindow : Window
     // ============ Сохранение данных ============
     private async void SaveAllData()
     {
-        if (allPasswords == null || allPasswords.Count == 0 ||
-            (allPasswords.Count == 1 && allPasswords.ContainsKey("Без группы") && allPasswords["Без группы"].Count == 0))
+        // Защита от сохранения до первой загрузки данных из БД.
+        // После загрузки сохраняем даже полностью пустое состояние —
+        // иначе удаление последнего пароля (например, из «Без группы») не сохранялось.
+        if (!_dataLoaded || allPasswords == null)
         {
-            Console.WriteLine(" SaveAllData: пропущено (пустые данные)");
+            Console.WriteLine(" SaveAllData: пропущено (данные ещё не загружены)");
             return;
         }
 

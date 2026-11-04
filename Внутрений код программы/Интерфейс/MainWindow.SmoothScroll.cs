@@ -19,6 +19,15 @@ namespace TinaPASS.Main;
 public partial class MainWindow : Window
 {
     // ============ Плавный скролл ============
+    // Шаг колеса за один щелчок (px). Больше, чем стандартные 50, — иначе скролл «вязкий».
+    private const double WheelScrollStep = 120.0;
+    // Доля оставшегося пути, которую проходим за один кадр (~60 FPS).
+    private const double SmoothScrollEasing = 0.28;
+    // Минимальный шаг, чтобы анимация не залипала на маленьких дельтах тачпада.
+    private const double SmoothScrollMinStep = 0.5;
+    // Если позицию изменили извне больше чем на столько пикселей — не мешаем (ползунок/клавиатура).
+    private const double SmoothScrollExternalDelta = 4.0;
+
     private void OnSmoothPointerWheelChanged(object? sender, PointerWheelEventArgs e)
     {
         var viewer = FindSmoothScrollViewer(e.Source as Visual);
@@ -27,12 +36,15 @@ public partial class MainWindow : Window
         double maxY = viewer.ScrollBarMaximum.Y;
         if (maxY <= 0) return;
 
-        if (_smoothScrollTargets.TryGetValue(viewer, out var target))
-            target += -e.Delta.Y * 50.0;
-        else
-            target = viewer.Offset.Y - e.Delta.Y * 50.0;
+        // Новый target считаем от уже накопленной цели, а не от текущего offset,
+        // чтобы быстрые щелчки колеса не «съедали» друг друга.
+        double baseY = _smoothScrollTargets.TryGetValue(viewer, out var pending)
+            ? pending
+            : viewer.Offset.Y;
 
-        _smoothScrollTargets[viewer] = Math.Max(0, Math.Min(target, maxY));
+        double target = Math.Clamp(baseY - e.Delta.Y * WheelScrollStep, 0, maxY);
+
+        _smoothScrollTargets[viewer] = target;
         _smoothScrollLastY[viewer] = viewer.Offset.Y;
         e.Handled = true;
 
@@ -56,7 +68,8 @@ public partial class MainWindow : Window
     {
         if (_smoothScrollTimer == null)
         {
-            _smoothScrollTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(8) };
+            // 16 мс = один кадр при 60 Гц. 8 мс только зря нагружали UI-поток.
+            _smoothScrollTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(16) };
             _smoothScrollTimer.Tick += OnSmoothScrollTick;
             _smoothScrollTimer.Start();
         }
@@ -67,35 +80,52 @@ public partial class MainWindow : Window
         bool any = false;
         foreach (var viewer in _smoothScrollTargets.Keys.ToList())
         {
-            if (viewer == null || viewer.IsVisible == false)
+            if (viewer == null || !viewer.IsVisible)
             {
                 _smoothScrollTargets.Remove(viewer);
+                _smoothScrollLastY.Remove(viewer);
                 continue;
             }
 
             double target = _smoothScrollTargets[viewer];
             double curY = viewer.Offset.Y;
 
-            if (_smoothScrollLastY.TryGetValue(viewer, out var lastY) && Math.Abs(curY - lastY) > 2.0)
-                target = curY;
+            // Кто-то прокрутил вручную (ползунок, клавиатура) — прекращаем анимацию.
+            if (_smoothScrollLastY.TryGetValue(viewer, out var lastY) &&
+                Math.Abs(curY - lastY) > SmoothScrollExternalDelta)
+            {
+                _smoothScrollTargets.Remove(viewer);
+                _smoothScrollLastY.Remove(viewer);
+                continue;
+            }
 
             double diff = target - curY;
             if (Math.Abs(diff) < 0.5)
             {
+                // Доводим до цели без «хвоста» в полпикселя.
+                if (Math.Abs(diff) > 0.01)
+                    viewer.Offset = new Vector(viewer.Offset.X, target);
+
                 _smoothScrollTargets.Remove(viewer);
+                _smoothScrollLastY.Remove(viewer);
                 continue;
             }
 
-            curY += diff * 0.2;
-            viewer.Offset = new Vector(viewer.Offset.X, curY);
-            _smoothScrollLastY[viewer] = curY;
+            double step = diff * SmoothScrollEasing;
+            if (Math.Abs(step) < SmoothScrollMinStep)
+                step = Math.Sign(diff) * SmoothScrollMinStep;
+
+            double newY = Math.Clamp(curY + step, 0, viewer.ScrollBarMaximum.Y);
+            viewer.Offset = new Vector(viewer.Offset.X, newY);
+            _smoothScrollLastY[viewer] = newY;
             any = true;
         }
 
         if (!any)
         {
-            _smoothScrollTimer.Stop();
-            _smoothScrollTimer.Tick -= OnSmoothScrollTick;
+            _smoothScrollTimer?.Stop();
+            if (_smoothScrollTimer != null)
+                _smoothScrollTimer.Tick -= OnSmoothScrollTick;
             _smoothScrollTimer = null;
         }
     }

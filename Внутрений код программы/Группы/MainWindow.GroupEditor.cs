@@ -65,15 +65,21 @@ public partial class MainWindow
 
     // ============ УДАЛЕНИЕ ГРУППЫ ============
 
-    private void OnDeleteGroupClick(object? sender, RoutedEventArgs e)
+    private void OnDeleteGroupClick(object? sender, RoutedEventArgs e) => DeleteGroup(currentGroup);
+
+    /// <summary>
+    /// Удаляет указанную группу (а не обязательно текущую) — используется
+    /// и кнопкой удаления, и контекстным меню по правому клику на группе.
+    /// </summary>
+    private void DeleteGroup(string groupName)
     {
-        if (string.IsNullOrEmpty(currentGroup) || currentGroup == "Без группы")
+        if (string.IsNullOrEmpty(groupName) || groupName == "Без группы")
         {
             ShowError("Нельзя удалить эту группу!");
             return;
         }
 
-        string deletingGroup = currentGroup;
+        string deletingGroup = groupName;
         int passwordCount = allPasswords.TryGetValue(deletingGroup, out var list) ? list.Count : 0;
 
         ShowConfirmation($"Удалить группу \"{deletingGroup}\" и все {passwordCount} паролей?", () =>
@@ -260,12 +266,101 @@ private Border? BuildGroupButton(string groupName)
     ToolTip.SetHorizontalOffset(container, 6);
     ToolTip.SetVerticalOffset(container, -3);
 
+    // Контекстное меню по правому клику: «Удалить» / «Отмена».
+    container.ContextFlyout = BuildGroupContextFlyout(groupName);
+
     // Подписка на события перетаскивания
     container.PointerPressed += OnGroupPointerPressed;
     container.PointerMoved += OnGroupPointerMoved;
     container.PointerReleased += OnGroupPointerReleased;
 
     return container;
+}
+
+// Строит контекстное меню группы (открывается правой кнопкой мыши)
+private Flyout BuildGroupContextFlyout(string groupName)
+{
+    var flyout = new Flyout
+    {
+        Placement = PlacementMode.Pointer
+    };
+
+    var panel = new StackPanel
+    {
+        Spacing = 2,
+        Width = 170
+    };
+
+    Button MakeItem(string icon, string text, IBrush foreground, Action action)
+    {
+        var content = new StackPanel
+        {
+            Orientation = Avalonia.Layout.Orientation.Horizontal,
+            Spacing = 10
+        };
+
+        content.Children.Add(new TextBlock
+        {
+            Text = icon,
+            FontFamily = new FontFamily(FluentIcons.Font),
+            FontSize = 14,
+            Foreground = foreground,
+            VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center
+        });
+
+        content.Children.Add(new TextBlock
+        {
+            Text = text,
+            FontSize = 14,
+            Foreground = foreground,
+            VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center
+        });
+
+        var button = new Button
+        {
+            Content = content,
+            Background = Brushes.Transparent,
+            BorderThickness = new Thickness(0),
+            Padding = new Thickness(10, 8),
+            HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch,
+            HorizontalContentAlignment = Avalonia.Layout.HorizontalAlignment.Left,
+            Cursor = new Cursor(StandardCursorType.Hand)
+        };
+
+        button.PointerEntered += (_, _) => button.Background = Brush.Parse("#22FFFFFF");
+        button.PointerExited += (_, _) => button.Background = Brushes.Transparent;
+        button.Click += (_, _) =>
+        {
+            flyout.Hide();
+            action();
+        };
+
+        return button;
+    }
+
+    panel.Children.Add(MakeItem(
+        FluentIcons.Delete,
+        "Удалить",
+        Brush.Parse("#FCA5A5"),
+        () => DeleteGroup(groupName)));
+
+    panel.Children.Add(MakeItem(
+        FluentIcons.Cancel,
+        "Отмена",
+        Brush.Parse("#E5E7EB"),
+        () => { }));
+
+    flyout.Content = new Border
+    {
+        Background = Brush.Parse("#14101C"),
+        BorderBrush = Brush.Parse("#3A2C4A"),
+        BorderThickness = new Thickness(1),
+        CornerRadius = new CornerRadius(10),
+        Padding = new Thickness(4),
+        Child = panel
+    };
+
+    return flyout;
 }
 
 }

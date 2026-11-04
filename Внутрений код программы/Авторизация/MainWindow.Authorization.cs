@@ -62,6 +62,7 @@ public partial class MainWindow
     }
 
     RefreshAllGroups();
+    _dataLoaded = true;
 }
     // ============ ВХОД (ЛОКАЛЬНЫЙ РЕЖИМ) ============
     private async void OnLoginCompleted(object? sender, bool isAuthenticated)

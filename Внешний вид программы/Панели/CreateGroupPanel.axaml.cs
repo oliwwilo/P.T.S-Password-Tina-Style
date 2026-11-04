@@ -18,6 +18,9 @@ public partial class CreateGroupPanel : UserControl
     public event EventHandler? Cancelled;
     private string? selectedImagePath;
     private GifHelper? _previewGifHelper;
+    private IBrush? _nameBoxDefaultBackground;
+    private IBrush? _photoDefaultBorder;
+    private IBrush? _photoDefaultBackground;
 
     public CreateGroupPanel()
     {
@@ -32,9 +35,31 @@ public partial class CreateGroupPanel : UserControl
         IsVisible = true;
         DragDrop.SetAllowDrop(PhotoPreview, true);
         GroupNameBox.Text = "";
+
+        // Запоминаем исходные цвета из темы, чтобы корректно сбрасывать
+        // красную подсветку ошибки и подсветку при наведении.
+        _nameBoxDefaultBackground ??= GroupNameBox.Background;
+        GroupNameBox.Background = _nameBoxDefaultBackground;
+        _photoDefaultBorder ??= PhotoPreview.BorderBrush;
+        _photoDefaultBackground ??= PhotoPreview.Background;
+
         selectedImagePath = null;
         UpdatePhotoPreview();
         GroupNameBox.Focus();
+    }
+
+    private void OnGroupNameKeyDown(object? sender, KeyEventArgs e)
+    {
+        if (e.Key == Key.Enter)
+        {
+            e.Handled = true;
+            OnCreateClick(sender, new RoutedEventArgs());
+        }
+        else if (e.Key == Key.Escape)
+        {
+            e.Handled = true;
+            OnCancelClick(sender, new RoutedEventArgs());
+        }
     }
 
     public void Hide()
@@ -56,9 +81,9 @@ public partial class CreateGroupPanel : UserControl
 
     private void OnPhotoPreviewLeave(object? sender, PointerEventArgs e)
     {
-        PhotoPreview.BorderBrush = Brush.Parse("#CBFF21");
+        PhotoPreview.BorderBrush = _photoDefaultBorder ?? Brush.Parse("#CBFF21");
         PhotoPreview.Background = string.IsNullOrEmpty(selectedImagePath)
-            ? Brush.Parse("#2D2D2D")
+            ? (_photoDefaultBackground ?? Brush.Parse("#2D2D2D"))
             : null;
         if (PhotoPreviewHint != null)
         {
@@ -113,7 +138,7 @@ public partial class CreateGroupPanel : UserControl
 
     private async void OnPhotoPreviewDrop(object? sender, DragEventArgs e)
     {
-        PhotoPreview.BorderBrush = Brush.Parse("#CBFF21");
+        PhotoPreview.BorderBrush = _photoDefaultBorder ?? Brush.Parse("#CBFF21");
         if (PhotoPreviewHint != null)
         {
             PhotoPreviewHint.Text = "Нажмите чтобы выбрать фото";
@@ -247,8 +272,8 @@ public partial class CreateGroupPanel : UserControl
         {
             PhotoPreviewText.IsVisible = true;
             PhotoPreviewText.Text = FluentIcons.Photo;
-            PhotoPreviewText.FontSize = 100;
-            PhotoPreview.Background = Brush.Parse("#2D2D2D");
+            PhotoPreviewText.FontSize = 48;
+            PhotoPreview.Background = _photoDefaultBackground ?? Brush.Parse("#2D2D2D");
         }
         else
         {
@@ -280,14 +305,14 @@ public partial class CreateGroupPanel : UserControl
                 {
                     PhotoPreviewText.IsVisible = true;
                     PhotoPreviewText.Text = FluentIcons.Cancel;
-                    PhotoPreviewText.FontSize = 100;
+                    PhotoPreviewText.FontSize = 48;
                 }
             }
             catch
             {
                 PhotoPreviewText.IsVisible = true;
                 PhotoPreviewText.Text = FluentIcons.Cancel;
-                PhotoPreviewText.FontSize = 100;
+                PhotoPreviewText.FontSize = 48;
             }
         }
     }
@@ -315,7 +340,7 @@ public partial class CreateGroupPanel : UserControl
 
     private void OnCancelClick(object? sender, RoutedEventArgs e)
     {
-        GroupNameBox.Background = Brush.Parse("#2D2D2D");
+        GroupNameBox.Background = _nameBoxDefaultBackground ?? Brush.Parse("#2D2D2D");
         Cancelled?.Invoke(this, EventArgs.Empty);
         Hide();
     }

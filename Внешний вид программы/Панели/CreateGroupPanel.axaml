@@ -2,104 +2,220 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="TinaPASS.Main.CreateGroupPanel">
 
+    <UserControl.Styles>
+        <Style Selector="Button">
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Transitions">
+                <Transitions>
+                    <BrushTransition Property="Background" Duration="0:0:0.15" />
+                    <BrushTransition Property="Foreground" Duration="0:0:0.15" />
+                </Transitions>
+            </Setter>
+        </Style>
+        <Style Selector="Button /template/ ContentPresenter">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Transitions" Value="{x:Null}" />
+        </Style>
+        <Style Selector="Button:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="Transparent" />
+        </Style>
+        <Style Selector="Button:pressed /template/ ContentPresenter">
+            <Setter Property="Background" Value="Transparent" />
+        </Style>
+
+        <Style Selector="Button.primary">
+            <Setter Property="Background" Value="#2E7D5B" />
+            <Setter Property="Foreground" Value="#EAFFF4" />
+            <Setter Property="FontWeight" Value="Bold" />
+        </Style>
+        <Style Selector="Button.primary:pointerover">
+            <Setter Property="Background" Value="#3A9C72" />
+            <Setter Property="Foreground" Value="White" />
+        </Style>
+        <Style Selector="Button.primary:pressed">
+            <Setter Property="Background" Value="#256B4D" />
+        </Style>
+
+        <Style Selector="Button.cancel">
+            <Setter Property="Background" Value="#2AEF4444" />
+            <Setter Property="Foreground" Value="#FECACA" />
+            <Setter Property="BorderBrush" Value="#55EF4444" />
+            <Setter Property="BorderThickness" Value="1" />
+        </Style>
+        <Style Selector="Button.cancel:pointerover">
+            <Setter Property="Background" Value="#40EF4444" />
+            <Setter Property="Foreground" Value="#FFF1F1" />
+        </Style>
+        <Style Selector="Button.cancel:pressed">
+            <Setter Property="Background" Value="#59EF4444" />
+        </Style>
+    </UserControl.Styles>
+
     <Grid>
         <Border Background="#80000000"
                 HorizontalAlignment="Stretch"
                 VerticalAlignment="Stretch"
                 Margin="0,33,0,0" />
 
-        <Border Background="Transparent" Tapped="OnOverlayTapped" Margin="0,33,0,0" />
+        <Border Background="Transparent"
+                Tapped="OnOverlayTapped"
+                Margin="0,33,0,0" />
 
-        <Border Background="{DynamicResource SurfaceBrush}"
-                CornerRadius="20"
-                Padding="25"
-                Width="350"
-                BorderBrush="{DynamicResource PrimaryBrush}"
-                BorderThickness="2"
+        <!-- ===== Стеклянная панель ===== -->
+        <Border CornerRadius="20"
+                Width="430"
+                BorderBrush="#2EFFFFFF"
+                BorderThickness="1"
                 HorizontalAlignment="Center"
-                VerticalAlignment="Center">
+                VerticalAlignment="Center"
+                BoxShadow="0 24 60 0 #B3000000">
+            <Border.Background>
+                <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
+                    <GradientStop Color="#C21E1430" Offset="0" />
+                    <GradientStop Color="#A60A0912" Offset="0.5" />
+                    <GradientStop Color="#CC000000" Offset="1" />
+                </LinearGradientBrush>
+            </Border.Background>
 
-            <StackPanel Spacing="15">
-
-                <TextBlock Text="Новая группа"
-                           FontFamily="{StaticResource PixelFont}"
-                           FontSize="77"
-                           FontWeight="Normal"
-                           Foreground="{DynamicResource AccentBrush}"
-                           HorizontalAlignment="Center" />
-
-                <!-- ВЫБОР ФОТО -->
-                <TextBlock Text="Фото группы"
-                           Foreground="{DynamicResource TextSecondaryBrush}"
-                           FontSize="14"
-                           FontWeight="SemiBold" 
-                           Margin="100,0,0,0"/>
-
-                <Border x:Name="PhotoPreview"
-                        Width="200"
-                        Height="200"
-                        CornerRadius="10"
-                        Background="{DynamicResource SurfaceBrush}"
-                        BorderBrush="{DynamicResource PrimaryBrush}"
-                        BorderThickness="1"
-                        Cursor="Hand"
-                        HorizontalAlignment="Center"
-                        PointerEntered="OnPhotoPreviewEnter"
-                        PointerExited="OnPhotoPreviewLeave"
-                        Tapped="OnPhotoPreviewTapped"
-                        ClipToBounds="True">
-                    <Panel>
-                        <TextBlock x:Name="PhotoPreviewText"
-                                   Text=""
-                                   FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
-                                   FontSize="100"
-                                   Foreground="{DynamicResource PrimaryBrush}"
-                                   HorizontalAlignment="Center"
-                                   VerticalAlignment="Center" />
-                        <TextBlock x:Name="PhotoPreviewHint"
-                                   Text="Нажмите чтобы выбрать фото"
-                                   FontSize="12"
-                                   Foreground="{DynamicResource PrimaryBrush}"
-                                   HorizontalAlignment="Center"
-                                   VerticalAlignment="Bottom"
-                                   Margin="0,0,0,8"
-                                   IsVisible="False" />
-                    </Panel>
+            <Grid>
+                <!-- Верхний блик стекла (лёгкий, без «молочного» налёта) -->
+                <Border CornerRadius="20,20,0,0"
+                        Height="110"
+                        VerticalAlignment="Top"
+                        IsHitTestVisible="False">
+                    <Border.Background>
+                        <LinearGradientBrush StartPoint="0%,0%" EndPoint="0%,100%">
+                            <GradientStop Color="#14FFFFFF" Offset="0" />
+                            <GradientStop Color="#00FFFFFF" Offset="1" />
+                        </LinearGradientBrush>
+                    </Border.Background>
                 </Border>
 
-                <!-- Название группы -->
-                <TextBlock Text="Название группы"
-                           Foreground="{DynamicResource TextSecondaryBrush}"
-                           FontSize="14"
-                           FontWeight="SemiBold"
-                           Margin="80,10,0,0" />
+                <!-- Внутренняя светлая грань -->
+                <Border CornerRadius="19"
+                        BorderBrush="#0FFFFFFF"
+                        BorderThickness="1"
+                        IsHitTestVisible="False" />
 
-                <TextBox x:Name="GroupNameBox"
-                         Watermark="Введите название"
-                         FontSize="14"
-                         Background="{DynamicResource SurfaceBrush}"
-                         CornerRadius="10"
-                         Padding="15" />
+                <StackPanel Margin="22" Spacing="14">
 
-                <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                <!-- Заголовок -->
+                <StackPanel Orientation="Horizontal"
+                            Spacing="8"
+                            HorizontalAlignment="Center">
+                    <TextBlock Text="&#xE710;"
+                               FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                               FontSize="20"
+                               Foreground="{DynamicResource AccentBrush}"
+                               VerticalAlignment="Center" />
+                    <TextBlock Text="Новая группа"
+                               FontFamily="{StaticResource PixelFont}"
+                               FontSize="20"
+                               FontWeight="ExtraBold"
+                               Foreground="{DynamicResource TextBrush}"
+                               VerticalAlignment="Center" />
+                </StackPanel>
+
+                <!-- Фото + название -->
+                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="18">
+
+                    <!-- Фото группы -->
+                    <StackPanel Grid.Column="0" Spacing="6">
+                        <TextBlock Text="Фото"
+                                   Foreground="{DynamicResource TextSecondaryBrush}"
+                                   FontSize="13"
+                                   FontWeight="SemiBold" />
+
+                        <Border x:Name="PhotoPreview"
+                                Width="132"
+                                Height="132"
+                                CornerRadius="14"
+                                Background="{DynamicResource SurfaceBrush}"
+                                BorderBrush="{DynamicResource PrimaryBrush}"
+                                BorderThickness="1"
+                                Cursor="Hand"
+                                PointerEntered="OnPhotoPreviewEnter"
+                                PointerExited="OnPhotoPreviewLeave"
+                                Tapped="OnPhotoPreviewTapped"
+                                ClipToBounds="True">
+                            <Panel>
+                                <TextBlock x:Name="PhotoPreviewText"
+                                           Text=""
+                                           FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                                           FontSize="48"
+                                           Foreground="{DynamicResource PrimaryBrush}"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center" />
+                                <TextBlock x:Name="PhotoPreviewHint"
+                                           Text="Выбрать фото"
+                                           FontSize="11"
+                                           TextWrapping="Wrap"
+                                           TextAlignment="Center"
+                                           Foreground="{DynamicResource PrimaryBrush}"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Bottom"
+                                           Margin="6,0,6,8"
+                                           IsVisible="False" />
+                            </Panel>
+                        </Border>
+
+                        <TextBlock Text="Клик или перетащите"
+                                   Foreground="{DynamicResource TextSecondaryBrush}"
+                                   FontSize="11"
+                                   TextWrapping="Wrap"
+                                   Width="132" />
+                    </StackPanel>
+
+                    <!-- Название группы -->
+                    <StackPanel Grid.Column="1" Spacing="6" VerticalAlignment="Top">
+                        <TextBlock Text="Название группы"
+                                   Foreground="{DynamicResource TextSecondaryBrush}"
+                                   FontSize="13"
+                                   FontWeight="SemiBold" />
+
+                        <TextBox x:Name="GroupNameBox"
+                                 Watermark="Введите название"
+                                 FontSize="14"
+                                 Background="{DynamicResource SurfaceBrush}"
+                                 Foreground="{DynamicResource TextBrush}"
+                                 BorderBrush="{DynamicResource BorderBrush}"
+                                 BorderThickness="1"
+                                 CornerRadius="10"
+                                 Padding="15"
+                                 KeyDown="OnGroupNameKeyDown" />
+
+                        <TextBlock Text="Например: Работа, Банки, Игры"
+                                   Foreground="{DynamicResource TextSecondaryBrush}"
+                                   FontSize="11"
+                                   TextWrapping="Wrap"
+                                   Opacity="0.8" />
+
+                        <TextBlock Text="Enter — создать, Esc — отмена"
+                                   Foreground="{DynamicResource TextSecondaryBrush}"
+                                   FontSize="11"
+                                   TextWrapping="Wrap"
+                                   Opacity="0.6"
+                                   Margin="0,4,0,0" />
+                    </StackPanel>
+                </Grid>
+
+                <!-- Кнопки -->
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="10" Margin="0,4,0,0">
                     <Button Grid.Column="0"
+                            Classes="cancel"
                             Content="Отмена"
                             Height="40"
                             CornerRadius="10"
-                            Background="{DynamicResource SurfaceBrush}"
-                            Foreground="{DynamicResource TextSecondaryBrush}"
                             Click="OnCancelClick" />
                     <Button Grid.Column="1"
+                            Classes="primary"
                             Content="Создать"
                             Height="40"
                             CornerRadius="10"
-                            Background="{DynamicResource PrimaryBrush}"
-                            Foreground="Black"
-                            FontWeight="Bold"
-                            Margin="60,0,0,0"
                             Click="OnCreateClick" />
                 </Grid>
             </StackPanel>
+            </Grid>
         </Border>
     </Grid>
 </UserControl>

@@ -182,9 +182,8 @@ private async Task PickAndImportFileAsync()
             // Аналог ImportFromDictionary — обработаем добавление данных из БД в nogroup_passwords
             SaveAllData();
 
-            // Обновляем UI
-            currentPasswords = new List<PasswordEntry>(allPasswords["Без группы"]);
-            UpdatePasswordsList();
+            // Обновляем UI с учётом активного поиска
+            ApplySearchFilter();
 
             ShowSuccessFlash($"{FluentIcons.CheckMark} Импортировано {imported.Count} паролей!");
         }

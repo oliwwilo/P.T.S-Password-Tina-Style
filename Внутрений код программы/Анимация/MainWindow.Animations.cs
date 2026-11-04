@@ -1,7 +1,10 @@
 using Avalonia;
+using Avalonia.Animation;
+using Avalonia.Animation.Easings;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Media;
+using Avalonia.Media.Transformation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,6 +28,7 @@ public partial class MainWindow
 
     /// <summary>
     /// Плавное появление подсветки активной группы (мягкий fade без пульсации).
+    /// Анимация выполняется на render-потоке через Transitions, а не ручным циклом.
     /// Предыдущая анимация отменяется, чтобы не было наложений и лагов.
     /// </summary>
     public async Task AnimateGroupHighlight(Border highlightBar, int steps = 16, int delayMs = 12)
@@ -33,26 +37,35 @@ public partial class MainWindow
         var cts = new CancellationTokenSource();
         _groupHighlightCts = cts;
 
+        var duration = TimeSpan.FromMilliseconds(
+            Math.Clamp(steps * Math.Max(delayMs, 1), 120, 320));
+
+        // Стартовое состояние — без анимации, чтобы не мигало.
+        highlightBar.Transitions = null;
         highlightBar.Background = HighlightGradientBrush;
         highlightBar.BoxShadow = new BoxShadows();
         highlightBar.Opacity = 0;
 
-        try
+        await Task.Yield();
+        if (cts.IsCancellationRequested) return;
+
+        highlightBar.Transitions = new Transitions
         {
-            for (int i = 1; i <= steps; i++)
+            new DoubleTransition
             {
-                if (cts.IsCancellationRequested) return;
-                double t = (double)i / steps;
-                double eased = 1 - Math.Pow(1 - t, 3);
-                highlightBar.Opacity = eased;
-                await Task.Delay(delayMs);
+                Property = Visual.OpacityProperty,
+                Duration = duration,
+                Easing = new CubicEaseOut()
             }
-        }
-        finally
-        {
-            highlightBar.Opacity = 1;
-            highlightBar.Background = HighlightGradientBrush;
-        }
+        };
+        highlightBar.Opacity = 1;
+
+        await Task.Delay(duration);
+        if (cts.IsCancellationRequested) return;
+
+        highlightBar.Opacity = 1;
+        highlightBar.Background = HighlightGradientBrush;
+        highlightBar.Transitions = null;
     }
 
     public void CancelGroupHighlight() => _groupHighlightCts?.Cancel();
@@ -137,72 +150,78 @@ public partial class MainWindow
 }
 
 /// <summary>
-/// Общий помощник плавного появления/скрытия панелей (fade-in / fade-out).
+/// Общий помощник плавного появления/скрытия панелей.
+/// Анимации выполняются на render-потоке через Transitions — без ручных циклов
+/// и Task.Delay на каждый кадр, поэтому движение остаётся плавным при любой нагрузке.
 /// </summary>
 public static class PanelFader
 {
     private static readonly Dictionary<Control, CancellationTokenSource> _cts = new();
+
+    /// <summary>Длительность перехода выводим из старых параметров steps/delayMs.</summary>
+    private static TimeSpan DurationFor(int steps, int delayMs)
+        => TimeSpan.FromMilliseconds(Math.Clamp(steps * Math.Max(delayMs, 1), 120, 420));
+
+    private static Transitions OpacityTransition(TimeSpan duration, Easing easing)
+        => new()
+        {
+            new DoubleTransition
+            {
+                Property = Visual.OpacityProperty,
+                Duration = duration,
+                Easing = easing
+            }
+        };
 
     public static async void FadeIn(Control? panel, int steps = 18, int delayMs = 14)
     {
         if (panel == null) return;
 
         var cts = Reset(panel);
-        panel.IsVisible = true;
-        panel.Opacity = 0;
-        await Task.Delay(delayMs);
+        var duration = DurationFor(steps, delayMs);
 
-        try
-        {
-            for (int i = 1; i <= steps; i++)
-            {
-                if (cts.IsCancellationRequested) return;
-                double t = (double)i / steps;
-                double eased = t * t * t * (t * (t * 6 - 15) + 10);
-                panel.Opacity = eased;
-                await Task.Delay(delayMs);
-            }
-        }
-        finally
-        {
-            if (!cts.IsCancellationRequested) panel.Opacity = 1;
-        }
+        // Стартовое состояние ставим мгновенно, без анимации.
+        panel.Transitions = null;
+        panel.Opacity = 0;
+        panel.IsVisible = true;
+
+        await Task.Yield();
+        if (cts.IsCancellationRequested) return;
+
+        panel.Transitions = OpacityTransition(duration, new CubicEaseOut());
+        panel.Opacity = 1;
+
+        await Task.Delay(duration);
+        if (cts.IsCancellationRequested) return;
+
+        panel.Opacity = 1;
+        panel.Transitions = null;
     }
 
     public static async void FadeOut(Control? panel, int steps = 18, int delayMs = 14)
     {
         if (panel == null) return;
 
+        var duration = DurationFor(steps, delayMs);
+
         if (!panel.IsVisible || panel.Opacity <= 0.001)
         {
-            panel.Opacity = 1;
+            panel.Transitions = null;
+            panel.Opacity = 0;
             panel.IsVisible = false;
             return;
         }
 
         var cts = Reset(panel);
-        double start = panel.Opacity;
-        await Task.Delay(delayMs);
+        panel.Transitions = OpacityTransition(duration, new CubicEaseIn());
+        panel.Opacity = 0;
 
-        try
-        {
-            for (int i = 1; i <= steps; i++)
-            {
-                if (cts.IsCancellationRequested) return;
-                double t = (double)i / steps;
-                double eased = t * t * t * (t * (t * 6 - 15) + 10);
-                panel.Opacity = start * (1 - eased);
-                await Task.Delay(delayMs);
-            }
-        }
-        finally
-        {
-            if (!cts.IsCancellationRequested)
-            {
-                panel.Opacity = 1;
-                panel.IsVisible = false;
-            }
-        }
+        await Task.Delay(duration);
+        if (cts.IsCancellationRequested) return;
+
+        panel.IsVisible = false;
+        panel.Opacity = 0;
+        panel.Transitions = null;
     }
 
     public static async void PopIn(Control? panel, int steps = 22, int delayMs = 12)
@@ -210,46 +229,41 @@ public static class PanelFader
         if (panel == null) return;
 
         var cts = Reset(panel);
-        panel.IsVisible = true;
+        var duration = DurationFor(steps, delayMs);
+
         panel.RenderTransformOrigin = new RelativePoint(0.5, 0.5, RelativeUnit.Relative);
+        panel.Transitions = null;
+        panel.Opacity = 0;
+        panel.RenderTransform = TransformOperations.Parse("scale(0.9) translate(0px, 18px)");
+        panel.IsVisible = true;
 
-        try
+        await Task.Yield();
+        if (cts.IsCancellationRequested) return;
+
+        panel.Transitions = new Transitions
         {
-            for (int i = 0; i <= steps; i++)
+            new DoubleTransition
             {
-                if (cts.IsCancellationRequested) return;
-                double t = (double)i / steps;
-                double eased = EaseOutBack(t);
-
-                panel.Opacity = Math.Clamp(eased, 0, 1);
-
-                double scale = 0.86 + 0.14 * eased;
-                double dy = (1 - eased) * 26;
-
-                var group = new TransformGroup();
-                group.Children.Add(new ScaleTransform(scale, scale));
-                group.Children.Add(new TranslateTransform(0, dy));
-                panel.RenderTransform = group;
-
-                await Task.Delay(delayMs);
-            }
-        }
-        finally
-        {
-            if (!cts.IsCancellationRequested)
+                Property = Visual.OpacityProperty,
+                Duration = duration,
+                Easing = new CubicEaseOut()
+            },
+            new TransformOperationsTransition
             {
-                panel.Opacity = 1;
-                panel.RenderTransform = new ScaleTransform(1, 1);
+                Property = Visual.RenderTransformProperty,
+                Duration = duration,
+                Easing = new CubicEaseOut()
             }
-        }
-    }
+        };
+        panel.Opacity = 1;
+        panel.RenderTransform = TransformOperations.Parse("scale(1) translate(0px, 0px)");
 
-    private static double EaseOutBack(double t)
-    {
-        const double c1 = 1.70158;
-        const double c3 = c1 + 1;
-        double x = t - 1;
-        return 1 + c3 * x * x * x + c1 * x * x;
+        await Task.Delay(duration);
+        if (cts.IsCancellationRequested) return;
+
+        panel.Transitions = null;
+        panel.Opacity = 1;
+        panel.RenderTransform = null;
     }
 
     private static CancellationTokenSource Reset(Control panel)

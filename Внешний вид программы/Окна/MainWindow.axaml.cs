@@ -45,6 +45,7 @@ public partial class MainWindow : Window
     private DatabaseService _dbService;
     private bool _isSaving = false;             // Защита от повторного сохранения
     private readonly object _saveLock = new object();
+    private bool _dataLoaded = false;           // Данные из БД загружены — можно сохранять даже пустое состояние
     private List<string> groupOrder = new List<string>();
     private readonly Dictionary<ScrollViewer, double> _smoothScrollTargets = new();
     private readonly Dictionary<ScrollViewer, double> _smoothScrollLastY = new();

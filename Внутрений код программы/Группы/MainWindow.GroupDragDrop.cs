@@ -26,6 +26,10 @@ public partial class MainWindow
         if (border.Tag is not string groupName) return;
         if (groupName == "Без группы") return;
 
+        // Перетаскивание и переключение — только левой кнопкой.
+        // Правая кнопка открывает контекстное меню «Удалить / Отмена».
+        if (!e.GetCurrentPoint(border).Properties.IsLeftButtonPressed) return;
+
         draggedGroup = border;
         dragStartPoint = e.GetPosition(GroupsPanel);
         isDraggingGroup = true;
@@ -69,6 +73,7 @@ public partial class MainWindow
 
     private async void OnGroupPointerReleased(object? sender, PointerReleasedEventArgs e)
     {
+        if (e.InitialPressMouseButton != MouseButton.Left) return;
         if (!isDraggingGroup || draggedGroup == null) return;
 
         string groupName = draggedGroup.Tag?.ToString() ?? "";
@@ -242,8 +247,7 @@ private async void MoveGroupToIndex(Border item, int targetIndex)
     // 3. Если переместили текущую группу – обновляем currentPasswords
     if (currentGroup == groupName && allPasswords.ContainsKey(groupName))
     {
-        currentPasswords = new List<PasswordEntry>(allPasswords[groupName]);
-        UpdatePasswordsList();
+        ApplySearchFilter();
     }
 
     NormalizeIds();

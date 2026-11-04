@@ -8,16 +8,20 @@ using Avalonia.Input.Platform;
 using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Media;
+using Avalonia.Media.Transformation;
 using Avalonia.Styling;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace TinaPASS.Main;
 
 public partial class MainWindow
 {
     private static readonly FontFamily CardFont = new FontFamily("avares://TinaPASS/Assets/Fonts#ZegerSYSTEM Alt");
+    private CancellationTokenSource? _passwordsFadeCts;
 
     private void OpenRegistrationButton_Click(object? sender, RoutedEventArgs e)
     {
@@ -31,7 +35,8 @@ public partial class MainWindow
         if (editingPassword == null)
         {
             password.GroupId = currentGroup;
-            currentPasswords.Add(password);
+            // Добавляем в полный список группы, а не в отфильтрованный currentPasswords.
+            GetFullCurrentGroupList().Add(password);
         }
         else
         {
@@ -41,8 +46,8 @@ public partial class MainWindow
             editingPassword.Password = password.Password;
         }
 
-        allPasswords[currentGroup] = new List<PasswordEntry>(currentPasswords);
-        UpdatePasswordsList();
+        // Пересобираем видимый список с учётом активного поиска.
+        ApplySearchFilter();
         SaveAllData();
         CloseAllPanels();
         ShowSuccessFlash($"✅ Пароль \"{password.Title}\" сохранен!");
@@ -99,9 +104,22 @@ public partial class MainWindow
 
         ShowConfirmation($"Удалить \"{password.Title}\"?", () =>
         {
-            currentPasswords.Remove(password);
-            allPasswords[currentGroup] = new List<PasswordEntry>(currentPasswords);
-            UpdatePasswordsList();
+            // Удаляем из полного списка группы (а не только из отфильтрованного поиском)
+            var fullList = GetFullCurrentGroupList();
+            int removed = fullList.RemoveAll(p => ReferenceEquals(p, password) || p.Id == password.Id);
+            if (removed == 0)
+                fullList.Remove(password);
+
+            currentPasswords.RemoveAll(p => ReferenceEquals(p, password) || p.Id == password.Id);
+
+            // Если удаляем пароль, открытый в редакторе — закрываем панель
+            if (ReferenceEquals(editingPassword, password))
+            {
+                editingPassword = null;
+                CloseAllPanels();
+            }
+
+            ApplySearchFilter();
             SaveAllData();
             ShowSuccessFlash($"✅ Пароль \"{password.Title}\" удален!");
         });
@@ -115,18 +133,20 @@ public partial class MainWindow
             return;
         }
 
-        if (currentPasswords.Count == 0)
+        // Очищаем всю группу, а не только видимые результаты поиска.
+        var fullList = GetFullCurrentGroupList();
+        if (fullList.Count == 0)
         {
             ShowError($"{FluentIcons.Warning} В группе нет паролей!");
             return;
         }
 
-        int count = currentPasswords.Count;
+        int count = fullList.Count;
         ShowConfirmation($"Очистить все {count} паролей?", () =>
         {
+            fullList.Clear();
             currentPasswords.Clear();
-            allPasswords[currentGroup] = new List<PasswordEntry>();
-            UpdatePasswordsList();
+            ApplySearchFilter();
             SaveAllData();
             ShowSuccessFlash($"{FluentIcons.CheckMark} Удалено паролей: {count}");
         });
@@ -198,17 +218,42 @@ public partial class MainWindow
             AddPassword?.Focus();
     }
 
-    private void UpdatePasswordsList()
+    private void UpdatePasswordsList(bool animate = false)
     {
         if (PasswordsContainer == null) return;
+
+        _passwordsFadeCts?.Cancel();
+
+        if (animate)
+        {
+            // Стартовое состояние для плавного появления нового списка.
+            PasswordsContainer.Transitions = null;
+            PasswordsContainer.Opacity = 0;
+            PasswordsContainer.RenderTransform = TransformOperations.Parse("translateY(10px)");
+        }
+        else
+        {
+            // Поиск/добавление/удаление обновляются мгновенно,
+            // чтобы список не «дёргался» на каждый символ.
+            PasswordsContainer.Transitions = null;
+            PasswordsContainer.Opacity = 1;
+            PasswordsContainer.RenderTransform = null;
+        }
+
         PasswordsContainer.Children.Clear();
 
         if (currentPasswords.Count == 0)
         {
+            string emptyMessage;
+            if (!string.IsNullOrWhiteSpace(_searchText))
+                emptyMessage = $"{FluentIcons.Search} Ничего не найдено по запросу \"{_searchText}\"";
+            else if (currentGroup == "Без группы")
+                emptyMessage = $"{FluentIcons.Folder} Системная папка\nЗдесь будут отображаться пароли без группы";
+            else
+                emptyMessage = $"{FluentIcons.Inbox} Нет сохраненных паролей";
+
             var emptyText = FluentIcons.Build(
-                currentGroup == "Без группы"
-                    ? $"{FluentIcons.Folder} Системная папка\nЗдесь будут отображаться пароли без группы"
-                    : $"{FluentIcons.Inbox} Нет сохраненных паролей",
+                emptyMessage,
                 14,
                 Brushes.White,
                 TextWrapping.Wrap);
@@ -216,6 +261,8 @@ public partial class MainWindow
             emptyText.Margin = new Thickness(0, 20, 0, 0);
             emptyText.TextAlignment = Avalonia.Media.TextAlignment.Center;
             PasswordsContainer.Children.Add(emptyText);
+
+            if (animate) StartPasswordsFadeIn();
             return;
         }
 
@@ -229,6 +276,46 @@ public partial class MainWindow
                 number++;
             }
         }
+
+        if (animate) StartPasswordsFadeIn();
+    }
+
+    /// <summary>
+    /// Плавно проявляет перестроенный список паролей после смены группы.
+    /// </summary>
+    private async void StartPasswordsFadeIn()
+    {
+        var cts = new CancellationTokenSource();
+        _passwordsFadeCts = cts;
+
+        await Task.Yield();
+        if (cts.IsCancellationRequested || PasswordsContainer == null) return;
+
+        var duration = TimeSpan.FromMilliseconds(220);
+        PasswordsContainer.Transitions = new Transitions
+        {
+            new DoubleTransition
+            {
+                Property = Visual.OpacityProperty,
+                Duration = duration,
+                Easing = new CubicEaseOut()
+            },
+            new TransformOperationsTransition
+            {
+                Property = Visual.RenderTransformProperty,
+                Duration = duration,
+                Easing = new CubicEaseOut()
+            }
+        };
+        PasswordsContainer.Opacity = 1;
+        PasswordsContainer.RenderTransform = TransformOperations.Parse("translateY(0px)");
+
+        await Task.Delay(duration);
+        if (cts.IsCancellationRequested || PasswordsContainer == null) return;
+
+        PasswordsContainer.Transitions = null;
+        PasswordsContainer.Opacity = 1;
+        PasswordsContainer.RenderTransform = null;
     }
 
     private Border? CreatePasswordCard(PasswordEntry password, int number)

@@ -111,9 +111,9 @@ public partial class ProfileWindow : Window
         var parent = this.Content as Panel;
         if (parent != null)
         {
-            toast.HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center;
-            toast.VerticalAlignment = Avalonia.Layout.VerticalAlignment.Bottom;
-            toast.Margin = new Thickness(0, 0, 0, 30);
+            toast.HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Right;
+            toast.VerticalAlignment = Avalonia.Layout.VerticalAlignment.Top;
+            toast.Margin = new Thickness(0, 20, 20, 0);
 
             parent.Children.Add(toast);
 

@@ -192,9 +192,6 @@ public partial class PassCardRed : UserControl
 
         PasswordSaved?.Invoke(this, passwordEntry);
         Hide();
-
-        var mainWindow = Application.Current?.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime;
-        (mainWindow?.MainWindow as MainWindow)?.ShowSuccessFlash($"{FluentIcons.CheckMark} Пароль \"{title}\" сохранен!");
     }
 
     private void OnOverlayTapped(object? sender, TappedEventArgs e) => OnCancelClick(sender, new RoutedEventArgs());
@@ -205,107 +202,21 @@ public partial class PassCardRed : UserControl
         Hide();
     }
 
-    private async void ShowError(string message)
+    private void ShowError(string message)
     {
-        var parent = this.Parent as Panel;
-        if (parent == null) return;
-
-        var flashCanvas = new Canvas
-        {
-            Background = null,
-            Width = this.Bounds.Width,
-            Height = this.Bounds.Height,
-            IsHitTestVisible = false
-        };
-
-        var flashBorder = new Border
-        {
-            Background = Brush.Parse("#FF4444"),
-            CornerRadius = new CornerRadius(10),
-            Padding = new Thickness(20, 10, 20, 10),
-            Opacity = 0
-        };
-
-        var label = FluentIcons.Build(message, 14, Brushes.White, TextWrapping.Wrap);
-        label.FontWeight = FontWeight.SemiBold;
-        flashBorder.Child = label;
-
-        flashBorder.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
-        var left = (this.Bounds.Width - flashBorder.DesiredSize.Width) / 2;
-        var top = this.Bounds.Height - 80;
-
-        Canvas.SetLeft(flashBorder, left);
-        Canvas.SetTop(flashBorder, top);
-        flashCanvas.Children.Add(flashBorder);
-
-        parent.Children.Add(flashCanvas);
-
-        for (int i = 0; i <= 10; i++)
-        {
-            flashBorder.Opacity = i * 0.1;
-            await Task.Delay(10);
-        }
-
-        await Task.Delay(1500);
-
-        for (int i = 10; i >= 0; i--)
-        {
-            flashBorder.Opacity = i * 0.1;
-            await Task.Delay(10);
-        }
-
-        parent.Children.Remove(flashCanvas);
+        // Все уведомления показываем в едином стеке главного окна.
+        var mainWindow = (Application.Current?.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime)?.MainWindow as MainWindow;
+        mainWindow?.ShowError(message);
     }
 
-    private async void ShowFlashMessage(string message)
+    private void ShowFlashMessage(string message)
     {
-        var parent = this.Parent as Panel;
-        if (parent == null) return;
+        var mainWindow = (Application.Current?.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime)?.MainWindow as MainWindow;
+        if (mainWindow == null) return;
 
-        var flashCanvas = new Canvas
-        {
-            Background = null,
-            Width = this.Bounds.Width,
-            Height = this.Bounds.Height,
-            IsHitTestVisible = false
-        };
-
-        var flashBorder = new Border
-        {
-            Background = Brush.Parse("#4CAF50"),
-            CornerRadius = new CornerRadius(10),
-            Padding = new Thickness(20, 10, 20, 10),
-            Opacity = 0
-        };
-
-        var label = FluentIcons.Build(message, 14, Brushes.White, TextWrapping.Wrap);
-        label.FontWeight = FontWeight.SemiBold;
-        flashBorder.Child = label;
-
-        flashBorder.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
-        var left = (this.Bounds.Width - flashBorder.DesiredSize.Width) / 2;
-        var top = this.Bounds.Height - 80;
-
-        Canvas.SetLeft(flashBorder, left);
-        Canvas.SetTop(flashBorder, top);
-        flashCanvas.Children.Add(flashBorder);
-
-        parent.Children.Add(flashCanvas);
-
-        for (int i = 0; i <= 10; i++)
-        {
-            flashBorder.Opacity = i * 0.1;
-            await Task.Delay(10);
-        }
-
-        await Task.Delay(1500);
-
-        for (int i = 10; i >= 0; i--)
-        {
-            flashBorder.Opacity = i * 0.1;
-            await Task.Delay(10);
-        }
-
-        parent.Children.Remove(flashCanvas);
+        if (message.StartsWith(FluentIcons.Warning, StringComparison.Ordinal))
+            mainWindow.ShowWarning(message);
+        else
+            mainWindow.ShowSuccessFlash(message);
     }
 }
