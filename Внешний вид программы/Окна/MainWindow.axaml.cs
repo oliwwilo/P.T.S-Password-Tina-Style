@@ -49,7 +49,6 @@ public partial class MainWindow : Window
     private List<string> groupOrder = new List<string>();
     private readonly Dictionary<ScrollViewer, double> _smoothScrollTargets = new();
     private readonly Dictionary<ScrollViewer, double> _smoothScrollLastY = new();
-    private DispatcherTimer? _smoothScrollTimer;
     
     // ============ КОНСТРУКТОР ============
     public MainWindow()

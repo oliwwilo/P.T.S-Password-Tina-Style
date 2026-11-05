@@ -7,7 +7,7 @@
         x:Class="TinaPASS.Main.MainWindow"
         Title=""
         Icon="/Assets/Логотип.ico"
-        TransparencyLevelHint="AcrylicBlur"
+        TransparencyLevelHint="Blur,AcrylicBlur"
         Background="Transparent"
         ExtendClientAreaToDecorationsHint="True"
 MinHeight="400"

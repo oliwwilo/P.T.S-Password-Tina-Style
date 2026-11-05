@@ -83,6 +83,7 @@ public partial class MainWindow : Window
     }
 
     private bool _backgroundPaused;
+    private bool _backgroundPausedForScroll;
 
     private void UpdateBackgroundAnimation()
     {
@@ -90,7 +91,8 @@ public partial class MainWindow : Window
 
         if (shouldRun && _backgroundPaused)
         {
-            BackgroundEffectManager.Instance.Resume();
+            if (!_backgroundPausedForScroll)
+                BackgroundEffectManager.Instance.Resume();
             _backgroundPaused = false;
         }
         else if (!shouldRun && !_backgroundPaused)
@@ -99,6 +101,25 @@ public partial class MainWindow : Window
             _backgroundPaused = true;
         }
     }
+
+    // Пока прокручиваем списки, фон замирает — так прокрутка получает больше кадров.
+    private void PauseBackgroundForScroll()
+    {
+        if (_backgroundPausedForScroll || _backgroundPaused) return;
+
+        BackgroundEffectManager.Instance.Pause();
+        _backgroundPausedForScroll = true;
+    }
+
+    private void ResumeBackgroundAfterScroll()
+    {
+        if (!_backgroundPausedForScroll) return;
+
+        _backgroundPausedForScroll = false;
+        if (IsVisible && WindowState != WindowState.Minimized)
+            BackgroundEffectManager.Instance.Resume();
+    }
+
     
     private string LoadSavedEffect()
     {

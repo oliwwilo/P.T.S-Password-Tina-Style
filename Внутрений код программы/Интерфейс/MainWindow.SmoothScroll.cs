@@ -21,12 +21,16 @@ public partial class MainWindow : Window
     // ============ Плавный скролл ============
     // Шаг колеса за один щелчок (px). Больше, чем стандартные 50, — иначе скролл «вязкий».
     private const double WheelScrollStep = 120.0;
-    // Доля оставшегося пути, которую проходим за один кадр (~60 FPS).
-    private const double SmoothScrollEasing = 0.28;
+    // Постоянная времени сглаживания (сек): за неё проходит ~63% оставшегося пути.
+    // Меньше — резче и быстрее, больше — плавнее и «тягучее».
+    private const double SmoothScrollTimeConstant = 0.06;
     // Минимальный шаг, чтобы анимация не залипала на маленьких дельтах тачпада.
     private const double SmoothScrollMinStep = 0.5;
     // Если позицию изменили извне больше чем на столько пикселей — не мешаем (ползунок/клавиатура).
     private const double SmoothScrollExternalDelta = 4.0;
+
+    private bool _smoothScrollFrameRequested;
+    private TimeSpan _smoothScrollLastFrame;
 
     private void OnSmoothPointerWheelChanged(object? sender, PointerWheelEventArgs e)
     {
@@ -48,7 +52,10 @@ public partial class MainWindow : Window
         _smoothScrollLastY[viewer] = viewer.Offset.Y;
         e.Handled = true;
 
-        EnsureSmoothScrollTimer();
+        // Пока идёт анимация, фон не перерисовываем: тяжёлые градиенты со
+        // сглаживанием отбирают кадры у прокрутки.
+        PauseBackgroundForScroll();
+        RequestSmoothScrollFrame();
     }
 
     private ScrollViewer? FindSmoothScrollViewer(Visual? v)
@@ -64,19 +71,43 @@ public partial class MainWindow : Window
         return null;
     }
 
-    private void EnsureSmoothScrollTimer()
+    /// <summary>
+    /// Просит следующий кадр отрисовки. В отличие от DispatcherTimer, колбэк
+    /// вызывается ровно один раз на кадр, поэтому движение не дёргается.
+    /// </summary>
+    private void RequestSmoothScrollFrame()
     {
-        if (_smoothScrollTimer == null)
+        if (_smoothScrollFrameRequested) return;
+
+        var topLevel = TopLevel.GetTopLevel(this);
+        if (topLevel == null)
         {
-            // 16 мс = один кадр при 60 Гц. 8 мс только зря нагружали UI-поток.
-            _smoothScrollTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(16) };
-            _smoothScrollTimer.Tick += OnSmoothScrollTick;
-            _smoothScrollTimer.Start();
+            _smoothScrollTargets.Clear();
+            _smoothScrollLastY.Clear();
+            ResumeBackgroundAfterScroll();
+            return;
         }
+
+        _smoothScrollFrameRequested = true;
+        topLevel.RequestAnimationFrame(OnSmoothScrollFrame);
     }
 
-    private void OnSmoothScrollTick(object? sender, EventArgs e)
+    private void OnSmoothScrollFrame(TimeSpan now)
     {
+        _smoothScrollFrameRequested = false;
+
+        // Шаг считаем от реального времени кадра, а не от «идеальных» 16 мс:
+        // тогда скорость движения не зависит от частоты кадров.
+        double dt = _smoothScrollLastFrame == default
+            ? 1.0 / 60.0
+            : (now - _smoothScrollLastFrame).TotalSeconds;
+        _smoothScrollLastFrame = now;
+
+        if (dt <= 0) dt = 1.0 / 60.0;
+        if (dt > 0.1) dt = 0.1; // после подвисания не прыгаем через пол-экрана
+
+        double factor = 1.0 - Math.Exp(-dt / SmoothScrollTimeConstant);
+
         bool any = false;
         foreach (var viewer in _smoothScrollTargets.Keys.ToList())
         {
@@ -111,7 +142,7 @@ public partial class MainWindow : Window
                 continue;
             }
 
-            double step = diff * SmoothScrollEasing;
+            double step = diff * factor;
             if (Math.Abs(step) < SmoothScrollMinStep)
                 step = Math.Sign(diff) * SmoothScrollMinStep;
 
@@ -121,13 +152,14 @@ public partial class MainWindow : Window
             any = true;
         }
 
-        if (!any)
+        if (any)
         {
-            _smoothScrollTimer?.Stop();
-            if (_smoothScrollTimer != null)
-                _smoothScrollTimer.Tick -= OnSmoothScrollTick;
-            _smoothScrollTimer = null;
+            RequestSmoothScrollFrame();
+        }
+        else
+        {
+            _smoothScrollLastFrame = default;
+            ResumeBackgroundAfterScroll();
         }
     }
-
 }
