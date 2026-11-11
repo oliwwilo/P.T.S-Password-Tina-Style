@@ -76,6 +76,12 @@ public partial class MainWindow : Window
             // отстаёт от курсора при быстром движении.
             this.PositionChanged += (s, e) => OnWindowMoved();
 
+            // Ловим самое начало перетаскивания (WM_ENTERSIZEMOVE), чтобы
+            // поставить фон на паузу до первого сдвига окна. Иначе при
+            // резком рывке один тяжёлый кадр успевает уйти в отрисовку
+            // и окно дёргается в самый первый момент.
+            this.Opened += (s, e) => AttachMoveHooks();
+
             // Ставим анимацию фона на паузу только когда окно свёрнуто или скрыто
             // (при обычной потере фокуса анимация продолжается) — экономит CPU.
             this.PropertyChanged += (s, e) =>
@@ -132,14 +138,16 @@ public partial class MainWindow : Window
 
     // Пока окно тащат по экрану, фон тоже замирает: перерисовка тяжёлого
     // градиента на UI-потоке не даёт окну успевать за курсором.
-    private void OnWindowMoved()
+    private void PauseBackgroundForMove()
     {
-        if (!_backgroundPausedForMove)
-        {
-            _backgroundPausedForMove = true;
-            UpdateBackgroundAnimation();
-        }
+        if (_backgroundPausedForMove) return;
 
+        _backgroundPausedForMove = true;
+        UpdateBackgroundAnimation();
+    }
+
+    private void ResumeBackgroundAfterMove()
+    {
         if (_moveSettleTimer == null)
         {
             _moveSettleTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(160) };
@@ -153,6 +161,47 @@ public partial class MainWindow : Window
 
         _moveSettleTimer.Stop();
         _moveSettleTimer.Start();
+    }
+
+    private void OnWindowMoved()
+    {
+        PauseBackgroundForMove();
+        ResumeBackgroundAfterMove();
+    }
+
+    // Хук WndProc: точное начало/конец системного перетаскивания окна.
+    private Win32Properties.CustomWndProcHookCallback? _moveWndProcHook;
+
+    private void AttachMoveHooks()
+    {
+        if (!OperatingSystem.IsWindows() || _moveWndProcHook != null) return;
+
+        const uint WM_ENTERSIZEMOVE = 0x0231;
+        const uint WM_EXITSIZEMOVE = 0x0232;
+
+        _moveWndProcHook = (IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam, ref bool handled) =>
+        {
+            if (msg == WM_ENTERSIZEMOVE)
+            {
+                PauseBackgroundForMove();
+            }
+            else if (msg == WM_EXITSIZEMOVE)
+            {
+                ResumeBackgroundAfterMove();
+            }
+
+            return IntPtr.Zero;
+        };
+
+        try
+        {
+            Win32Properties.AddWndProcHookCallback(this, _moveWndProcHook);
+        }
+        catch
+        {
+            // Не на Windows или платформа без Win32 — остаётся пауза по PositionChanged.
+            _moveWndProcHook = null;
+        }
     }
 
     
