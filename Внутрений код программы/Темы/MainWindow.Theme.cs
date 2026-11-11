@@ -72,6 +72,10 @@ public partial class MainWindow : Window
                 BackgroundEffectManager.Instance.Resize(this.Bounds.Width, this.Bounds.Height);
             };
 
+            // Пока окно перемещают по экрану, фон замирает — иначе окно
+            // отстаёт от курсора при быстром движении.
+            this.PositionChanged += (s, e) => OnWindowMoved();
+
             // Ставим анимацию фона на паузу только когда окно свёрнуто или скрыто
             // (при обычной потере фокуса анимация продолжается) — экономит CPU.
             this.PropertyChanged += (s, e) =>
@@ -84,15 +88,22 @@ public partial class MainWindow : Window
 
     private bool _backgroundPaused;
     private bool _backgroundPausedForScroll;
+    private bool _backgroundPausedForMove;
+    private DispatcherTimer? _moveSettleTimer;
+
+    private bool BackgroundShouldRun =>
+        IsVisible
+        && WindowState != WindowState.Minimized
+        && !_backgroundPausedForScroll
+        && !_backgroundPausedForMove;
 
     private void UpdateBackgroundAnimation()
     {
-        bool shouldRun = IsVisible && WindowState != WindowState.Minimized;
+        bool shouldRun = BackgroundShouldRun;
 
         if (shouldRun && _backgroundPaused)
         {
-            if (!_backgroundPausedForScroll)
-                BackgroundEffectManager.Instance.Resume();
+            BackgroundEffectManager.Instance.Resume();
             _backgroundPaused = false;
         }
         else if (!shouldRun && !_backgroundPaused)
@@ -105,10 +116,10 @@ public partial class MainWindow : Window
     // Пока прокручиваем списки, фон замирает — так прокрутка получает больше кадров.
     private void PauseBackgroundForScroll()
     {
-        if (_backgroundPausedForScroll || _backgroundPaused) return;
+        if (_backgroundPausedForScroll) return;
 
-        BackgroundEffectManager.Instance.Pause();
         _backgroundPausedForScroll = true;
+        UpdateBackgroundAnimation();
     }
 
     private void ResumeBackgroundAfterScroll()
@@ -116,8 +127,32 @@ public partial class MainWindow : Window
         if (!_backgroundPausedForScroll) return;
 
         _backgroundPausedForScroll = false;
-        if (IsVisible && WindowState != WindowState.Minimized)
-            BackgroundEffectManager.Instance.Resume();
+        UpdateBackgroundAnimation();
+    }
+
+    // Пока окно тащат по экрану, фон тоже замирает: перерисовка тяжёлого
+    // градиента на UI-потоке не даёт окну успевать за курсором.
+    private void OnWindowMoved()
+    {
+        if (!_backgroundPausedForMove)
+        {
+            _backgroundPausedForMove = true;
+            UpdateBackgroundAnimation();
+        }
+
+        if (_moveSettleTimer == null)
+        {
+            _moveSettleTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(160) };
+            _moveSettleTimer.Tick += (s, e) =>
+            {
+                _moveSettleTimer!.Stop();
+                _backgroundPausedForMove = false;
+                UpdateBackgroundAnimation();
+            };
+        }
+
+        _moveSettleTimer.Stop();
+        _moveSettleTimer.Start();
     }
 
     
